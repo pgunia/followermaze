@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Vendor: com.soundcloud
+Implementation-Title: followermaze-tester
+Implementation-Version: 2.0-SNAPSHOT
+Implementation-Vendor-Id: com.soundcloud
+Specification-Vendor: com.soundcloud
+Specification-Title: followermaze-tester
+Specification-Version: 2.0-SNAPSHOT
+Main-Class: com.soundcloud.followermaze.Main
+
