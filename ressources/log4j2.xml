@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration status="WARN">
+	<Appenders>
+		<File name="File" fileName="ressources/server.log" append="false">
+			<PatternLayout>
+				<pattern>%d{HH:mm:ss.SSS} %-5level %class{36} %M - %msg%xEx%n</pattern>
+			</PatternLayout>
+		</File>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %M - %msg%xEx%n" />
+		</Console>
+	</Appenders>
+	<Loggers>
+		<Root level="trace">
+			<AppenderRef ref="File" level="ERROR" />
+			<!-- <AppenderRef ref="Console" level="ERROR" />-->
+		</Root>
+	</Loggers>
+</Configuration>
