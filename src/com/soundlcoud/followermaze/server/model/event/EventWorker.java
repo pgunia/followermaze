@@ -3,7 +3,7 @@ package com.soundlcoud.followermaze.server.model.event;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.soundcloud.followermaze.service.EventHandlerService;
+import com.soundcloud.followermaze.server.service.EventHandlerService;
 
 public class EventWorker implements Runnable {
 

@@ -1,7 +1,7 @@
 package com.soundlcoud.followermaze.server.model.event;
 
 import com.soundcloud.followermaze.server.model.client.Client;
-import com.soundcloud.followermaze.service.UserRegistryService;
+import com.soundcloud.followermaze.server.service.UserRegistryService;
 
 public class PrivateMsgEvent extends AbstractEvent {
 

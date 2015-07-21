@@ -6,7 +6,7 @@ import java.nio.charset.Charset;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.soundcloud.followermaze.service.UserRegistryService;
+import com.soundcloud.followermaze.server.service.UserRegistryService;
 
 /**
  * Instances of this class represent a connected user. Instances of class are immutable.
