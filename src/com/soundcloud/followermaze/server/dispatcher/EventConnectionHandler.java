@@ -29,7 +29,7 @@ public class EventConnectionHandler extends ConnectionHandler {
     message.get( byteBuffer, 0, numberOfBytesToRead );
 
     final String messageStr = new String( byteBuffer, "UTF-8" );
-    logger.info( "Processing message: " + messageStr );
+    logger.debug( "Processing message: " + messageStr );
 
     EventHandlerService.INSTANCE.addEvent( EventFactory.createEvent( messageStr ) );
     logger.exit();

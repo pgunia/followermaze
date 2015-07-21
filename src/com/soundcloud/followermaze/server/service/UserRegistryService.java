@@ -61,6 +61,7 @@ public enum UserRegistryService {
   public void removeClient( final Client client ) {
     logger.entry( client );
     registeredClients.remove( client.getId() );
+    notificationQueues.remove( client.getId() );
     logger.exit();
   }
 

@@ -1,9 +1,6 @@
 package com.soundcloud.followermaze.server.service;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.PriorityQueue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,39 +14,25 @@ public enum EventHandlerService {
   private final Logger logger = LogManager.getLogger( EventHandlerService.class );
 
   /** Queue that holds events, due to single threaded processing, no need for synchronization */
-  final SortedSet<Event> eventQueue = new TreeSet<Event>();
+  final PriorityQueue<Event> eventQueue = new PriorityQueue<Event>();
 
+  /** Sequence number of next event to process */
   int nextSequenceNumber = 1;
-
-  // due to sequential processing of incoming events, use a one-thread-executor
-  final ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-  int eventsAdded = 0;
 
   private EventHandlerService() {
   }
 
   public void addEvent( final Event event ) {
-
     logger.entry( event );
-    eventsAdded++;
+
     // push to queue
     eventQueue.add( event );
 
-    if ( eventQueue.size() > 5000 ) {
-      try {
-        Thread.sleep( 500 );
-      } catch ( InterruptedException e ) {
-        e.printStackTrace();
-      }
-    }
+    // doing this in the current thread blocks and limits the incoming rate on the producer side
+    final EventWorker worker = new EventWorker();
+    worker.run();
 
-    // start worker every time an event is added
-    executorService.submit( new EventWorker() );
-    if ( (eventsAdded % 10) == 0 ) {
-      logger.debug( "Added " + eventsAdded + " events." );
-    }
-    logger.error( "Events on Queue: " + eventQueue.size() );
+    logger.debug( "Events on Queue: " + eventQueue.size() );
     logger.exit();
   }
 
@@ -63,17 +46,14 @@ public enum EventHandlerService {
 
   public Event first() {
     if ( eventQueue.size() > 0 ) {
-      return eventQueue.first();
+      return eventQueue.peek();
     } else {
       return null;
     }
   }
 
   public boolean remove( final Event event ) {
-    logger.entry( event );
-    final boolean result = eventQueue.remove( event );
-    logger.debug( "Events on Queue: " + eventQueue.size() );
-    logger.exit( result );
-    return result;
+    return eventQueue.remove( event );
+
   }
 }
