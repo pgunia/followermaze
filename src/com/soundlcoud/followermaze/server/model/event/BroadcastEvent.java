@@ -5,12 +5,19 @@ import java.util.Collection;
 import com.soundcloud.followermaze.server.model.client.Client;
 import com.soundcloud.followermaze.server.service.UserRegistryService;
 
+/**
+ * Instances of this class represent broadcast event
+ */
 public class BroadcastEvent extends AbstractEvent {
 
   public BroadcastEvent( Integer sequenceNumber, String message ) {
     super( sequenceNumber, -1, -1, message );
   }
 
+  /**
+   * Processes the broadcast events. All at a point in time connected clients are notified. Method iterates through the list of connected clients and creates a new notification job for each. Those
+   * jobs are processed concurrently by the client specific executor services. This decouples notifications from the first part of event processing.
+   */
   @Override
   public void processEvent() {
     logger.entry();

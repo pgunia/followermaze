@@ -9,6 +9,11 @@ import org.apache.logging.log4j.Logger;
 
 import com.soundcloud.followermaze.server.config.ConfigService;
 
+/**
+ * ConnectionHandler is the abstract base class for the UserClientConnectionHandler and the EventConnectionHandler. Implements the functionality to read bytes from a SocketChannel into a buffer. These
+ * buffers are then processed by subclass speicifc methods.
+ *
+ */
 abstract class ConnectionHandler implements Runnable {
 
   private static final Logger logger = LogManager.getLogger( ConnectionHandler.class );
@@ -62,13 +67,9 @@ abstract class ConnectionHandler implements Runnable {
           // this handles additional linebreaks
           if ( curByte == lineBreak ) {
             processMessage( resultBuffer );
-            // resultBuffer.compact();
             resultBuffer.clear();
-            // resultBuffer = ByteBuffer.allocate( resultBufferSize );
           }
         }
-        // tempBuffer.compact();
-        // tempBuffer = ByteBuffer.allocate( maxBufferSize );
         tempBuffer.clear();
       }
     } catch ( Exception ex ) {

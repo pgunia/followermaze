@@ -3,16 +3,24 @@ package com.soundlcoud.followermaze.server.model.event;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Abstract base class of all events generated and processed within the server. Immutable
+ *
+ */
 public abstract class AbstractEvent implements Event, Comparable<Event> {
 
   protected static final Logger logger = LogManager.getLogger( AbstractEvent.class );
 
+  /** Sequence number of the event instance */
   final Integer sequenceNumber;
 
+  /** To user ID extracted from the source message */
   final Integer toUserId;
 
+  /** From user ID extracted from the source message */
   final Integer fromUserId;
 
+  /** String representation of the payload of the source message */
   final String messageStr;
 
   public AbstractEvent( Integer sequenceNumber, Integer fromUserId, Integer toUserId, String messageStr ) {

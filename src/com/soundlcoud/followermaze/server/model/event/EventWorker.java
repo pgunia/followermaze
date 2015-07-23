@@ -5,13 +5,19 @@ import org.apache.logging.log4j.Logger;
 
 import com.soundcloud.followermaze.server.service.EventHandlerService;
 
+/**
+ * Instances of this class are used to process the events which are created by the EventHandlerService based on the byte data read from event source.
+ *
+ */
 public class EventWorker implements Runnable {
 
   private static final Logger logger = LogManager.getLogger( EventWorker.class );
 
-  public EventWorker() {
-  }
-
+  /**
+   * Method processes the events which are currently on the event queue handled by the EventHandlerService. The processing first retrieves the next sequence number to be processed and the event with
+   * the smallest sequence number on the queue. If the numbers match, the event is processed, the number is increased, and the next event is taken from the queue. This iteration ends when the next
+   * sequence number and the smallest event´s sequence number on the queue don´t match or if the queue is empty.
+   */
   @Override
   public void run() {
     logger.entry();

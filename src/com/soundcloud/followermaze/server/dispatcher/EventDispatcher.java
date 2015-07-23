@@ -8,18 +8,33 @@ import java.util.concurrent.Executors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * 
+ * Instance of this class waits for incoming connections on the event source port (default 9090). It uses Java NIO configured to be non-blocking. If a client connects on the port, a new
+ * EventConnectionHandler is created that gets the socket channel instance created by the socket.accept(). The EventConnectionHandler is passed into an executor service which processes it decoupled
+ * from the listening loop.
+ */
 public class EventDispatcher extends BaseDispatcher {
 
   private static final Logger logger = LogManager.getLogger( EventDispatcher.class );
 
+  /**
+   * @param port
+   *          Port in which the socket waits for incoming connections
+   */
   public EventDispatcher( final int port ) {
     super( port );
   }
 
+  /**
+   * Method contains the main listening loop for incoming client connections. If a client connection is received, the method creates an instance of EventConnectionHandler and passes it into an
+   * executor service for concurrent processing.
+   */
   @Override
   public void run() {
     logger.entry();
-    // use single thread executor, there´s only one client connecting to the server
+
+    // use single thread executor as there is only one client connecting on this port
     final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     try {

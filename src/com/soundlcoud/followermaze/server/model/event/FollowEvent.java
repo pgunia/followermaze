@@ -3,12 +3,19 @@ package com.soundlcoud.followermaze.server.model.event;
 import com.soundcloud.followermaze.server.model.client.Client;
 import com.soundcloud.followermaze.server.service.UserRegistryService;
 
+/**
+ * Instances of this class represent followe events
+ *
+ */
 public class FollowEvent extends AbstractEvent {
 
   public FollowEvent( Integer sequenceNumber, Integer fromUserId, Integer toUserId, String messageStr ) {
     super( sequenceNumber, fromUserId, toUserId, messageStr );
   }
 
+  /**
+   * Method processes the follow event and adds a new follower to the list of followers of the "to user" before adding a new notification job to the executor service of the "to user" client instance.
+   */
   @Override
   public void processEvent() {
     logger.entry();

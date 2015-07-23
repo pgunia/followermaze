@@ -3,12 +3,19 @@ package com.soundlcoud.followermaze.server.model.event;
 import com.soundcloud.followermaze.server.model.client.Client;
 import com.soundcloud.followermaze.server.service.UserRegistryService;
 
+/**
+ * Instances of this class represent private message events
+ *
+ */
 public class PrivateMsgEvent extends AbstractEvent {
 
   public PrivateMsgEvent( Integer sequenceNumber, Integer fromUserId, Integer toUserId, String eventStr ) {
     super( sequenceNumber, fromUserId, toUserId, eventStr );
   }
 
+  /**
+   * Method processes private message events by adding a notification job to the executor service of the "to user"
+   */
   @Override
   public void processEvent() {
     logger.entry();
