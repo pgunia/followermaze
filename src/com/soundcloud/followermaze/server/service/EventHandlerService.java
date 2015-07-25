@@ -82,6 +82,12 @@ public enum EventHandlerService {
    */
   public boolean remove( final Event event ) {
     return eventQueue.remove( event );
+  }
 
+  /**
+   * Clears the event queue
+   */
+  public void shutdown() {
+    eventQueue.clear();
   }
 }

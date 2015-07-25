@@ -19,7 +19,7 @@ public class ClientSocket extends BaseSocket {
   private static final Logger logger = LogManager.getLogger( ClientSocket.class );
 
   /** Maximum wait time in seconds until the clients disconnect from the server if they don´t receive messages, uses same timeout as test soundcloud testclient */
-  private static int READ_TIMEOUT = 20000;
+  private static int READ_TIMEOUT = 5000;
 
   /** Message terminator */
   private static String MESSAGE_TERMINATOR = "\r\n";
@@ -54,7 +54,9 @@ public class ClientSocket extends BaseSocket {
       // decrement latch
       connectedLatch.countDown();
       final String result = retrieveMessages();
-      TestCoordinatorService.INSTANCE.addRetrievedMessages( userId, result );
+      if ( result.length() > 0 ) {
+        TestCoordinatorService.INSTANCE.addRetrievedMessages( userId, result );
+      }
     }
   }
 

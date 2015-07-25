@@ -1,5 +1,6 @@
 package com.soundcloud.followermaze.server.model.client;
 
+import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 
@@ -52,7 +53,7 @@ public class Client {
     logger.entry( messageStr );
     try {
       logger.debug( "Sending message " + messageStr + " to " + id );
-      int bytesWritten = this.clientSocket.write( Charset.forName( CHARSET ).encode( messageStr ) );
+      int bytesWritten = clientSocket.write( Charset.forName( CHARSET ).encode( messageStr ) );
       logger.debug( "Sent " + bytesWritten + " bytes to client!" );
     } catch ( Exception e ) {
       // Client is no longer connected, remove it from the userregistry
@@ -60,6 +61,17 @@ public class Client {
       UserRegistryService.INSTANCE.removeClient( this );
     }
     logger.exit();
+  }
+
+  /**
+   * Closes the socket connection to the user client
+   */
+  public void closeConnection() {
+    try {
+      clientSocket.close();
+    } catch ( IOException e ) {
+      logger.error( "Error closing sokcet to client " + getId(), e );
+    }
   }
 
   /**

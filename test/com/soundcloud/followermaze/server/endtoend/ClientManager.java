@@ -29,7 +29,7 @@ public class ClientManager {
   private static final List<ClientSocket> clients = new ArrayList<ClientSocket>();
 
   /** Executor service that connects the clients to the sever by calling their run() method */
-  private static final ExecutorService connectionExecutor = Executors.newFixedThreadPool( NUMBER_OF_CLIENTS );
+  private ExecutorService connectionExecutor = null;
 
   /**
    * Creates a configured number of clients and connected them to the server on the specified port
@@ -38,6 +38,7 @@ public class ClientManager {
    *          Port on which the clients connect to the server
    */
   public CountDownLatch connectClients( final int port ) {
+    connectionExecutor = Executors.newFixedThreadPool( NUMBER_OF_CLIENTS );
     final CountDownLatch registerClientsLatch = new CountDownLatch( NUMBER_OF_CLIENTS );
     final CountDownLatch clientTimeoutLatch = new CountDownLatch( NUMBER_OF_CLIENTS );
     for ( int i = 0; i < NUMBER_OF_CLIENTS; i++ ) {

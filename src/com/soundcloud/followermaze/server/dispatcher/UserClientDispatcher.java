@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.soundcloud.followermaze.server.config.ConfigService;
+import com.soundcloud.followermaze.server.service.UserRegistryService;
 
 class UserClientDispatcher extends BaseDispatcher {
 
@@ -27,7 +28,7 @@ class UserClientDispatcher extends BaseDispatcher {
       logger.info( "UserClientDispatcher is waiting for incoming connections..." );
       // server is ready for incoming connections
       readyLatch.countDown();
-      while ( true ) {
+      while ( running ) {
         final SocketChannel clientSocket = serverSocket.accept();
         if ( clientSocket != null ) {
           executorService.submit( new UserClientConnectionHandler( clientSocket ) );
@@ -37,6 +38,7 @@ class UserClientDispatcher extends BaseDispatcher {
       logger.error( "Error during socket communication.", e );
     } finally {
       try {
+        cleanUp();
         logger.info( "Closing sockets..." );
         serverSocket.close();
         logger.info( "Closing sockets...completed" );
@@ -47,5 +49,10 @@ class UserClientDispatcher extends BaseDispatcher {
         logger.error( "Error during component shutdown.", e );
       }
     }
+  }
+
+  @Override
+  void cleanUp() {
+    UserRegistryService.INSTANCE.shutdown();
   }
 }

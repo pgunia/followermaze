@@ -33,4 +33,12 @@ public enum TestCoordinatorService {
     return retrievedMessages.get( toUserId );
   }
 
+  /**
+   * Cleans up all data stored in the service
+   */
+  public void clear() {
+    sendMessages.clear();
+    retrievedMessages.clear();
+  }
+
 }

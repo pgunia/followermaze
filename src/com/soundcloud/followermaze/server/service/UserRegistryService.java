@@ -157,4 +157,20 @@ public enum UserRegistryService {
     executor.submit( new ClientNotification( message, client ) );
   }
 
+  /**
+   * Method cleans up before shutting down the server
+   */
+  public void shutdown() {
+
+    // close all client sockets
+    for ( Client curClient : getAllRegisteredUser() ) {
+      curClient.closeConnection();
+    }
+
+    // clear all queues
+    this.followers.clear();
+    this.notificationQueues.clear();
+    this.registeredClients.clear();
+  }
+
 }

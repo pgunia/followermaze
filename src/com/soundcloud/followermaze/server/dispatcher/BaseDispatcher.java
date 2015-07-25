@@ -22,6 +22,12 @@ public abstract class BaseDispatcher implements Runnable, Dispatcher {
   /** Latch is used to signal when the server is ready to accept incoming connections */
   protected final CountDownLatch readyLatch;
 
+  /** Flag controls the main loop */
+  protected volatile boolean running = true;
+
+  /** Method is called before thread shutdown and cleans up the components used by the subclass */
+  abstract void cleanUp();
+
   /**
    * Constructor creates the ServerSocketChannel and binds it to the passed in port
    * 
@@ -41,5 +47,10 @@ public abstract class BaseDispatcher implements Runnable, Dispatcher {
       logger.error( "Error during connection creation! " + ex );
     }
     logger.exit();
+  }
+
+  /** Sets the main loop control flag to false */
+  public void shutdown() {
+    running = false;
   }
 }

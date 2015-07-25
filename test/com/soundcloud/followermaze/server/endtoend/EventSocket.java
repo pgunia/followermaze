@@ -7,6 +7,7 @@ import java.util.List;
 
 public class EventSocket extends BaseSocket {
 
+  /** List holds all messages to be sent to the Server */
   private final List<String> messagesToSend;
 
   EventSocket( final List<String> messageList, int port ) {

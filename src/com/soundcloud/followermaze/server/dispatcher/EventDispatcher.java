@@ -9,6 +9,8 @@ import java.util.concurrent.Executors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.soundcloud.followermaze.server.service.EventHandlerService;
+
 /**
  * 
  * Instance of this class waits for incoming connections on the event source port (default 9090). It uses Java NIO configured to be non-blocking. If a client connects on the port, a new
@@ -42,7 +44,7 @@ public class EventDispatcher extends BaseDispatcher {
       logger.info( "EventDispatcher is waiting for incoming connections..." );
       // server is ready for incoming connections
       readyLatch.countDown();
-      while ( true ) {
+      while ( running ) {
         final SocketChannel clientSocket = serverSocket.accept();
         if ( clientSocket != null ) {
           logger.debug( "Submitting new ConnectionHandler Task" );
@@ -53,6 +55,7 @@ public class EventDispatcher extends BaseDispatcher {
       logger.error( "Error during socket communication.", e );
     } finally {
       try {
+        cleanUp();
         logger.info( "Closing sockets..." );
         serverSocket.close();
         logger.info( "Closing sockets...completed" );
@@ -64,5 +67,11 @@ public class EventDispatcher extends BaseDispatcher {
       }
     }
     logger.exit();
+  }
+
+  @Override
+  void cleanUp() {
+    // shut down EventHandlerService
+    EventHandlerService.INSTANCE.shutdown();
   }
 }
