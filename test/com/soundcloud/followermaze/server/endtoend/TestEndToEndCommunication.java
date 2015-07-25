@@ -15,17 +15,26 @@ import com.soundcloud.followermaze.server.dispatcher.BaseDispatcher;
 import com.soundcloud.followermaze.server.dispatcher.EventDispatcher;
 import com.soundcloud.followermaze.server.dispatcher.UserClientDispatcher;
 
+/**
+ * 
+ * Tests end-to-end communication by creating a BaseDispatcher and a UserClientDispatcher, clients and an evend source. All test types are tested and send to the server which forwards them to the
+ * clients. The correct arrival of the messages at the client is used for test verification.
+ */
 public class TestEndToEndCommunication {
 
   private static final Logger logger = LogManager.getLogger( TestEndToEndCommunication.class );
 
+  /** List keeps all started threads to terminate them during tearDown */
   final private static List<Thread> threads = new ArrayList<Thread>();
 
+  /** Port on which clients connect to the server */
   final static int CLIENT_PORT = 9099;
 
+  /** Port on which the event source connects to the server */
   final static int EVENT_SOURCE_PORT = 9090;
 
-  final static long RAMP_UP_SERVER_WAIT_TIME = 2000;
+  /** Time to wait for the server to start up before starting the tests */
+  final static long RAMP_UP_SERVER_WAIT_TIME = 1000;
 
   @Before
   public void setUp() throws Exception {
@@ -74,15 +83,15 @@ public class TestEndToEndCommunication {
     messagesRetrievedClient2.append( "1|F|1|2" + lineSeparator );
 
     // create two clients connected to the server
-    final String userId1 = "1" + lineSeparator;
+    final Integer userId1 = 1;
     final BaseSocket clientSocket1 = new ClientSocket( userId1, CLIENT_PORT );
     logger.info( "Start retrieving messages for client 1 from server..." );
     Thread clientSocket1Thread = new Thread( clientSocket1 );
     threads.add( clientSocket1Thread );
     clientSocket1Thread.start();
 
-    final String userId2 = "2" + lineSeparator;
-    final BaseSocket clientSocket2 = new ClientSocket( userId2, CLIENT_PORT );
+    final Integer userId2 = 2;
+    final BaseSocket clientSocket2 = new ClientSocket( 2, CLIENT_PORT );
     logger.info( "Start retrieving messages for client 2 from server..." );
     Thread clientSocket2Thread = new Thread( clientSocket2 );
     threads.add( clientSocket2Thread );
@@ -105,11 +114,11 @@ public class TestEndToEndCommunication {
 
     // compare the send and retrieved messages for both clients
     final String send1 = messagesRetrievedClient1.toString();
-    final String retrieved1 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( userId1.trim() );
+    final String retrieved1 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( userId1 );
     assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send1 + " , Retrieved: " + retrieved1 + " END", send1.equals( retrieved1 ) );
 
     final String send2 = messagesRetrievedClient2.toString();
-    final String retrieved2 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( userId2.trim() );
+    final String retrieved2 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( userId2 );
     assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send2 + " , Retrieved: " + retrieved2 + " END", send2.equals( retrieved2 ) );
     logger.exit();
   }

@@ -12,24 +12,24 @@ public enum TestCoordinatorService {
   INSTANCE;
 
   /** Buffer holds all messages send to the server for a specific client id */
-  private final Map<String, String> sendMessages = new ConcurrentHashMap<String, String>();
+  private final Map<Integer, String> sendMessages = new ConcurrentHashMap<Integer, String>();
 
   /** Buffer holds all messages retrieved by the client for a specific client id */
-  private final Map<String, String> retrievedMessages = new ConcurrentHashMap<String, String>();
+  private final Map<Integer, String> retrievedMessages = new ConcurrentHashMap<Integer, String>();
 
-  public void addSendMessages( final String toUserId, final String messages ) {
-    sendMessages.put( toUserId, messages );
+  public void addSendMessages( final Integer userId, final String messages ) {
+    sendMessages.put( userId, messages );
   }
 
-  public void addRetrievedMessages( final String toUserId, final String messages ) {
+  public void addRetrievedMessages( final Integer toUserId, final String messages ) {
     retrievedMessages.put( toUserId, messages );
   }
 
-  public String getSendMessagesForUserId( final String toUserId ) {
+  public String getSendMessagesForUserId( final Integer toUserId ) {
     return sendMessages.get( toUserId );
   }
 
-  public String getRetrievedMessagesByUserId( final String toUserId ) {
+  public String getRetrievedMessagesByUserId( final Integer toUserId ) {
     return retrievedMessages.get( toUserId );
   }
 

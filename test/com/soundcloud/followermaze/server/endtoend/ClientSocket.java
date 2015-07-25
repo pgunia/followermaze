@@ -11,14 +11,21 @@ import java.nio.charset.Charset;
 
 public class ClientSocket extends BaseSocket {
 
+  /** Maximum wait time in seconds until the clients disconnect from the server if they don´t receive messages */
   private static int READ_TIMEOUT = 2000;
 
-  private final String userId;
+  /** Message terminator */
+  private static String MESSAGE_TERMINATOR = "\r\n";
 
-  public ClientSocket( final String userId, final int port ) {
+  /** Encoding used in communication with the server */
+  private static String ENCODING = "UTF-8";
+
+  /** ID of the client as it is sent */
+  private final int userId;
+
+  public ClientSocket( final int id, final int port ) {
     super( port );
-
-    this.userId = userId;
+    this.userId = id;
   }
 
   @Override
@@ -28,7 +35,7 @@ public class ClientSocket extends BaseSocket {
     final boolean registered = registerAtServer();
     if ( registered ) {
       final String result = retrieveMessages();
-      TestCoordinatorService.INSTANCE.addRetrievedMessages( userId.trim(), result );
+      TestCoordinatorService.INSTANCE.addRetrievedMessages( userId, result );
     }
   }
 
@@ -41,17 +48,17 @@ public class ClientSocket extends BaseSocket {
     logger.entry();
     logger.info( "Register User at server" );
     try {
-      final CharBuffer buffer = CharBuffer.wrap( userId );
+      final CharBuffer buffer = CharBuffer.wrap( String.valueOf( userId ) + MESSAGE_TERMINATOR );
 
       while ( buffer.hasRemaining() ) {
-        clientSocket.write( Charset.forName( "UTF-8" ).encode( buffer ) );
+        clientSocket.write( Charset.forName( ENCODING ).encode( buffer ) );
       }
     } catch ( Exception e ) {
       logger.error( "Error during registration at server!", e );
       logger.exit( false );
       return false;
     }
-    logger.info( "Registered " + userId.trim() );
+    logger.info( "Registered " + userId );
     logger.exit( true );
     return true;
   }
@@ -87,7 +94,7 @@ public class ClientSocket extends BaseSocket {
 
         // flip the buffer to start reading
         tempBuffer.flip();
-        messageBuffer.append( Charset.forName( "UTF-8" ).decode( tempBuffer ) );
+        messageBuffer.append( Charset.forName( ENCODING ).decode( tempBuffer ) );
         tempBuffer.compact();
       }
     } catch ( SocketTimeoutException ex ) {
