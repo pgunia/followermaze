@@ -2,6 +2,7 @@ package com.soundcloud.followermaze.server.dispatcher;
 
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,7 +17,10 @@ public abstract class BaseDispatcher implements Runnable, Dispatcher {
   private static final Logger logger = LogManager.getLogger( BaseDispatcher.class );
 
   /** ServerSocketChannel which is used for listening for incoming connections */
-  protected ServerSocketChannel serverSocket = null;
+  protected ServerSocketChannel serverSocket;
+
+  /** Latch is used to signal when the server is ready to accept incoming connections */
+  protected final CountDownLatch readyLatch;
 
   /**
    * Constructor creates the ServerSocketChannel and binds it to the passed in port
@@ -24,9 +28,10 @@ public abstract class BaseDispatcher implements Runnable, Dispatcher {
    * @param port
    *          Port on which the socket channel is waiting for incoming connections
    */
-  public BaseDispatcher( int port ) {
+  public BaseDispatcher( int port, final CountDownLatch readySignal ) {
     super();
-    logger.entry( port );
+    logger.entry( port, readySignal );
+    this.readyLatch = readySignal;
     try {
       // use NIO ServerSockets
       serverSocket = ServerSocketChannel.open();

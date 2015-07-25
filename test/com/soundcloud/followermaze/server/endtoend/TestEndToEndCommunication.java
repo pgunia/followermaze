@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,9 +12,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.soundcloud.followermaze.server.dispatcher.BaseDispatcher;
-import com.soundcloud.followermaze.server.dispatcher.EventDispatcher;
-import com.soundcloud.followermaze.server.dispatcher.UserClientDispatcher;
+import com.soundcloud.followermaze.server.dispatcher.ServerManager;
 
 /**
  * 
@@ -22,10 +21,17 @@ import com.soundcloud.followermaze.server.dispatcher.UserClientDispatcher;
  */
 public class TestEndToEndCommunication {
 
+  /** Logger */
   private static final Logger logger = LogManager.getLogger( TestEndToEndCommunication.class );
 
   /** List keeps all started threads to terminate them during tearDown */
   final private static List<Thread> threads = new ArrayList<Thread>();
+
+  /** Manager to handle startup and shutdown of servers */
+  final private ServerManager serverManager = new ServerManager();
+
+  /** Manager to create and handle clients */
+  final private ClientManager clientManager = new ClientManager();
 
   /** Port on which clients connect to the server */
   final static int CLIENT_PORT = 9099;
@@ -36,34 +42,24 @@ public class TestEndToEndCommunication {
   /** Time to wait for the server to start up before starting the tests */
   final static long RAMP_UP_SERVER_WAIT_TIME = 1000;
 
+  /** Latch which is decremented, when all clients disconnect due to connection timeouts */
+  private CountDownLatch clientTimeoutLatch = null;
+
   @Before
   public void setUp() throws Exception {
     logger.entry();
 
-    // start both servers
-    final BaseDispatcher eventDispatcher = new EventDispatcher( EVENT_SOURCE_PORT );
-    Thread eventDispatcherThread = new Thread( eventDispatcher );
-    threads.add( eventDispatcherThread );
-    eventDispatcherThread.start();
+    serverManager.startUpServers( EVENT_SOURCE_PORT, CLIENT_PORT );
+    clientTimeoutLatch = clientManager.connectClients( CLIENT_PORT );
 
-    final UserClientDispatcher clientDispatcher = new UserClientDispatcher( CLIENT_PORT );
-    Thread userClientDispatcherThread = new Thread( clientDispatcher );
-    threads.add( userClientDispatcherThread );
-    userClientDispatcherThread.start();
-
-    // give the servers some time to start up
-    Thread.sleep( RAMP_UP_SERVER_WAIT_TIME );
     logger.exit();
   }
 
   @After
   public void tearDown() throws Exception {
     logger.entry();
-    // kill the collected server threads
-    for ( Thread curThread : threads ) {
-      // it´s deprecated, but does the job, no need for gracefully shutdown
-      curThread.stop();
-    }
+    serverManager.stopServers();
+    clientManager.disconnectAllClients();
     logger.exit();
   }
 
@@ -82,21 +78,6 @@ public class TestEndToEndCommunication {
     messagesRetrievedClient1.append( "2|F|2|1" + lineSeparator );
     messagesRetrievedClient2.append( "1|F|1|2" + lineSeparator );
 
-    // create two clients connected to the server
-    final Integer userId1 = 1;
-    final BaseSocket clientSocket1 = new ClientSocket( userId1, CLIENT_PORT );
-    logger.info( "Start retrieving messages for client 1 from server..." );
-    Thread clientSocket1Thread = new Thread( clientSocket1 );
-    threads.add( clientSocket1Thread );
-    clientSocket1Thread.start();
-
-    final Integer userId2 = 2;
-    final BaseSocket clientSocket2 = new ClientSocket( 2, CLIENT_PORT );
-    logger.info( "Start retrieving messages for client 2 from server..." );
-    Thread clientSocket2Thread = new Thread( clientSocket2 );
-    threads.add( clientSocket2Thread );
-    clientSocket2Thread.start();
-
     // create Event Source, that sends the messages to the server
     final BaseSocket eventSource = new EventSocket( messagesSent, EVENT_SOURCE_PORT );
     logger.info( "Start sending events to server..." );
@@ -105,20 +86,19 @@ public class TestEndToEndCommunication {
     threads.add( eventSourceThread );
     eventSourceThread.start();
 
-    // wait a while to check results, make sure to exceed the client read timeouts
     try {
-      Thread.sleep( 10000 );
+      clientTimeoutLatch.await();
     } catch ( InterruptedException e ) {
-      e.printStackTrace();
+      logger.error( "Error while waiting for clients to disconnect!", e );
     }
 
     // compare the send and retrieved messages for both clients
     final String send1 = messagesRetrievedClient1.toString();
-    final String retrieved1 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( userId1 );
+    final String retrieved1 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 1 );
     assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send1 + " , Retrieved: " + retrieved1 + " END", send1.equals( retrieved1 ) );
 
     final String send2 = messagesRetrievedClient2.toString();
-    final String retrieved2 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( userId2 );
+    final String retrieved2 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 2 );
     assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send2 + " , Retrieved: " + retrieved2 + " END", send2.equals( retrieved2 ) );
     logger.exit();
   }

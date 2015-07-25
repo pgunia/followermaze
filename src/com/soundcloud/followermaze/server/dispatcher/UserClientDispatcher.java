@@ -1,6 +1,7 @@
 package com.soundcloud.followermaze.server.dispatcher;
 
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -9,12 +10,12 @@ import org.apache.logging.log4j.Logger;
 
 import com.soundcloud.followermaze.server.config.ConfigService;
 
-public class UserClientDispatcher extends BaseDispatcher {
+class UserClientDispatcher extends BaseDispatcher {
 
   private static final Logger logger = LogManager.getLogger( UserClientDispatcher.class );
 
-  public UserClientDispatcher( int port ) {
-    super( port );
+  public UserClientDispatcher( int port, final CountDownLatch readyLatch ) {
+    super( port, readyLatch );
   }
 
   @Override
@@ -24,6 +25,8 @@ public class UserClientDispatcher extends BaseDispatcher {
 
     try {
       logger.info( "UserClientDispatcher is waiting for incoming connections..." );
+      // server is ready for incoming connections
+      readyLatch.countDown();
       while ( true ) {
         final SocketChannel clientSocket = serverSocket.accept();
         if ( clientSocket != null ) {

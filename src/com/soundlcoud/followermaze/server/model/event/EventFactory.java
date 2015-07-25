@@ -21,7 +21,12 @@ public class EventFactory {
 
     // check for type based on String parsing, use trimmed component to remove linebreak at the end
     final String[] components = eventStr.trim().split( SEPARATOR );
-    final String eventTypeIdentifier = components[1];
+    String eventTypeIdentifier = null;
+    try {
+      eventTypeIdentifier = components[1];
+    } catch ( ArrayIndexOutOfBoundsException ex ) {
+      logger.error( "Invalid event: " + eventStr, ex );
+    }
     Event result = null;
     try {
       switch ( eventTypeIdentifier ) {

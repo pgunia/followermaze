@@ -2,6 +2,7 @@ package com.soundcloud.followermaze.server.dispatcher;
 
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,8 +23,8 @@ public class EventDispatcher extends BaseDispatcher {
    * @param port
    *          Port in which the socket waits for incoming connections
    */
-  public EventDispatcher( final int port ) {
-    super( port );
+  EventDispatcher( final int port, final CountDownLatch readyLatch ) {
+    super( port, readyLatch );
   }
 
   /**
@@ -39,6 +40,8 @@ public class EventDispatcher extends BaseDispatcher {
 
     try {
       logger.info( "EventDispatcher is waiting for incoming connections..." );
+      // server is ready for incoming connections
+      readyLatch.countDown();
       while ( true ) {
         final SocketChannel clientSocket = serverSocket.accept();
         if ( clientSocket != null ) {

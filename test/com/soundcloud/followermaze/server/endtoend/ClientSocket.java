@@ -8,11 +8,18 @@ import java.nio.CharBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
+import java.util.concurrent.CountDownLatch;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ClientSocket extends BaseSocket {
 
-  /** Maximum wait time in seconds until the clients disconnect from the server if they don´t receive messages */
-  private static int READ_TIMEOUT = 2000;
+  /** Logger */
+  private static final Logger logger = LogManager.getLogger( ClientSocket.class );
+
+  /** Maximum wait time in seconds until the clients disconnect from the server if they don´t receive messages, uses same timeout as test soundcloud testclient */
+  private static int READ_TIMEOUT = 20000;
 
   /** Message terminator */
   private static String MESSAGE_TERMINATOR = "\r\n";
@@ -20,20 +27,32 @@ public class ClientSocket extends BaseSocket {
   /** Encoding used in communication with the server */
   private static String ENCODING = "UTF-8";
 
+  /** Uses count down latch to pause test processing until all clients are accepting connections */
+  private final CountDownLatch connectedLatch;
+
+  /** Uses count down latches to wait with further processing until all clients disconnected from the server */
+  private final CountDownLatch timeoutLatch;
+
   /** ID of the client as it is sent */
   private final int userId;
 
-  public ClientSocket( final int id, final int port ) {
+  public ClientSocket( final int id, final int port, final CountDownLatch connectedLatch, final CountDownLatch timeoutLatch ) {
     super( port );
     this.userId = id;
+    this.connectedLatch = connectedLatch;
+    this.timeoutLatch = timeoutLatch;
   }
 
   @Override
   public void run() {
     logger.entry();
 
+    // reister at server
     final boolean registered = registerAtServer();
     if ( registered ) {
+
+      // decrement latch
+      connectedLatch.countDown();
       final String result = retrieveMessages();
       TestCoordinatorService.INSTANCE.addRetrievedMessages( userId, result );
     }
@@ -104,6 +123,7 @@ public class ClientSocket extends BaseSocket {
       logger.error( "Error during reading from socket!", ex );
     } finally {
       try {
+        timeoutLatch.countDown();
         clientSocket.close();
       } catch ( IOException e ) {
         logger.error( "Error during socket close", e );
