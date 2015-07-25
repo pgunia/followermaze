@@ -21,21 +21,49 @@ abstract class ConnectionHandler implements Runnable {
   /** Holds ClientSocket from this incoming data is read / written */
   protected final SocketChannel clientSocket;
 
-  private int bytesReadTotal = 0;
+  /** Linebreak */
+  protected static int MESSAGE_TERMINATOR = 10;
 
+  /** Enconding of the incoming and outgoing byte data */
+  protected static String ENCODING = "UTF-8";
+
+  /**
+   * Returns the subclass specific size of the tempbuffer which reads data from a SocketChannel.
+   * 
+   * @return Number of bytes used for allocation of the bytebuffer
+   */
   abstract public int getMaxBufferSize();
 
+  /**
+   * Read messages from the client sockets are passed to this method to be further processed inside the specific subclasses.
+   * 
+   * @param message
+   *          ByteBuffer containing a message
+   * @throws Exception
+   */
   abstract void processMessage( final ByteBuffer message ) throws Exception;
 
   public ConnectionHandler( final SocketChannel clientSocket ) {
     this.clientSocket = clientSocket;
   }
 
+  /**
+   * Returns the length of the result buffer which is used to hold the content of a single message
+   * 
+   * @return Resultbuffer size in byte
+   */
   protected int getResultBufferLengthInByte() {
     return ConfigService.INSTANCE.getResultBufferLengthInByte();
   }
 
-  protected ByteBuffer readMessage() throws Exception {
+  /**
+   * Method reads data from a connected SocketChannel until no more bytes are received. The bytes are read into a a bytebuffer which is then copied byte-per-byte into a result bytebuffer to find the
+   * message terminator byte. The content of the result buffer is further processed by subclass specific implementations of processMessage()
+   * 
+   * @throws Exception
+   *           IOException
+   */
+  protected void readMessage() throws Exception {
 
     logger.entry();
 
@@ -43,7 +71,8 @@ abstract class ConnectionHandler implements Runnable {
     final int maxBufferSize = getMaxBufferSize();
     final int resultBufferSize = getResultBufferLengthInByte();
 
-    int lineBreak = 10;
+    int bytesReadTotal = 0;
+
     ByteBuffer resultBuffer = ByteBuffer.allocate( resultBufferSize );
     ByteBuffer tempBuffer = ByteBuffer.allocate( maxBufferSize );
 
@@ -64,8 +93,8 @@ abstract class ConnectionHandler implements Runnable {
           final byte curByte = tempBuffer.get( i );
           resultBuffer.put( curByte );
 
-          // this handles additional linebreaks
-          if ( curByte == lineBreak ) {
+          // message completely read?
+          if ( curByte == MESSAGE_TERMINATOR ) {
             processMessage( resultBuffer );
             resultBuffer.clear();
           }
@@ -83,9 +112,13 @@ abstract class ConnectionHandler implements Runnable {
       }
     }
     logger.exit( resultBuffer );
-    return resultBuffer;
+
   }
 
+  /**
+   * Run method automatically called by the executor service. For every connection established to the server, an instance of either UserClientConnectionHandler of EventConnectionHandler is created and
+   * added to the job queue of an executor service.
+   */
   @Override
   public void run() {
     logger.entry();
@@ -103,21 +136,4 @@ abstract class ConnectionHandler implements Runnable {
     }
     logger.exit();
   }
-
-  /**
-   * Method creates a copy of the pasted bytebuffer
-   * 
-   * @param original
-   *          ByteBuffer which should be copied
-   * @return
-   */
-  protected static ByteBuffer clone( ByteBuffer original ) {
-    ByteBuffer clone = ByteBuffer.allocate( original.capacity() );
-    original.rewind();
-    clone.put( original );
-    original.rewind();
-    clone.flip();
-    return clone;
-  }
-
 }

@@ -1,5 +1,6 @@
 package com.soundcloud.followermaze.server.dispatcher;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
@@ -32,9 +33,11 @@ public class EventConnectionHandler extends ConnectionHandler {
    * 
    * @param message
    *          Message in byte format
+   * @throws UnsupportedEncodingException
+   *           The target encoding specification is not supported
    */
   @Override
-  void processMessage( ByteBuffer message ) throws Exception {
+  void processMessage( ByteBuffer message ) throws UnsupportedEncodingException {
 
     logger.entry( message );
     int numberOfBytesToRead = message.position();
@@ -43,7 +46,7 @@ public class EventConnectionHandler extends ConnectionHandler {
     message.flip();
     message.get( byteBuffer, 0, numberOfBytesToRead );
 
-    final String messageStr = new String( byteBuffer, "UTF-8" );
+    final String messageStr = new String( byteBuffer, ENCODING );
     logger.debug( "Processing message: " + messageStr );
 
     EventHandlerService.INSTANCE.addEvent( EventFactory.createEvent( messageStr ) );

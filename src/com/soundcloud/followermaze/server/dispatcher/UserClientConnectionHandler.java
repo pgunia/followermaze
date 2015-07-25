@@ -1,5 +1,6 @@
 package com.soundcloud.followermaze.server.dispatcher;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
@@ -10,6 +11,11 @@ import com.soundcloud.followermaze.server.config.ConfigService;
 import com.soundcloud.followermaze.server.model.client.Client;
 import com.soundcloud.followermaze.server.service.UserRegistryService;
 
+/**
+ * Instances of this class handle connections from user clients to the server. Every client sends a message that contains its client id, this message is received and parsed to register the client in
+ * the UserRegistryService
+ *
+ */
 public class UserClientConnectionHandler extends ConnectionHandler {
 
   private static final Logger logger = LogManager.getLogger( UserClientConnectionHandler.class );
@@ -19,10 +25,10 @@ public class UserClientConnectionHandler extends ConnectionHandler {
   }
 
   @Override
-  void processMessage( ByteBuffer message ) throws Exception {
+  void processMessage( ByteBuffer message ) throws UnsupportedEncodingException, IllegalArgumentException {
     logger.entry( message );
 
-    final String messageStr = new String( message.array(), "UTF-8" ).trim();
+    final String messageStr = new String( message.array(), ENCODING ).trim();
     Integer userId = null;
     try {
       userId = Integer.valueOf( messageStr );

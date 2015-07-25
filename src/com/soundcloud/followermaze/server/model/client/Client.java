@@ -9,20 +9,21 @@ import org.apache.logging.log4j.Logger;
 import com.soundcloud.followermaze.server.service.UserRegistryService;
 
 /**
- * Instances of this class represent a connected user. Instances of class are immutable.
+ * Instances of this class represent a connected user.
  *
  */
 public class Client {
 
   private static final Logger logger = LogManager.getLogger( Client.class );
 
+  /** Charset used for encoding */
+  private static final String CHARSET = "UTF-8";
+
   /** ID of current client */
   private final Integer id;
 
   /** Socketchannel over which the client is connected */
   private final SocketChannel clientSocket;
-
-  private final Object lock = new Object();
 
   /**
    * 
@@ -44,22 +45,21 @@ public class Client {
    * Method sends message to current user
    * 
    * @param messageStr
+   *          Message to be sent to the user
    */
   public void notify( String messageStr ) {
 
-    // lock ensures that there will be no race conditions during notification can happen
-    synchronized ( lock ) {
-      logger.entry( messageStr );
-      try {
-        logger.info( "Sending message " + messageStr + " to " + id );
-        int bytesWritten = this.clientSocket.write( Charset.forName( "UTF-8" ).encode( messageStr ) );
-        logger.info( "Sent " + bytesWritten + " bytes to client!" );
-      } catch ( Exception e ) {
-        logger.error( "Error notifying client.", e );
-        UserRegistryService.INSTANCE.removeClient( this );
-      }
-      logger.exit();
+    logger.entry( messageStr );
+    try {
+      logger.debug( "Sending message " + messageStr + " to " + id );
+      int bytesWritten = this.clientSocket.write( Charset.forName( CHARSET ).encode( messageStr ) );
+      logger.debug( "Sent " + bytesWritten + " bytes to client!" );
+    } catch ( Exception e ) {
+      // Client is no longer connected, remove it from the userregistry
+      logger.error( "Error notifying client.", e );
+      UserRegistryService.INSTANCE.removeClient( this );
     }
+    logger.exit();
   }
 
   /**

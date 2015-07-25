@@ -26,13 +26,15 @@ public enum UserRegistryService {
   /** Logger */
   private static final Logger logger = LogManager.getLogger( UserRegistryService.class );
 
-  /** needs synchronization due to highly concurrent access during registration and removal */
+  /** Needs synchronization due to highly concurrent access during registration and removal */
   private final Map<Integer, Client> registeredClients = new ConcurrentHashMap<Integer, Client>();
 
-  /** does not need synchronization due to single threaded event processing */
+  /** Does not need synchronization due to single threaded event processing */
   private final Map<Integer, Set<Integer>> followers = new HashMap<Integer, Set<Integer>>();
 
-  /** Map holds ExecutorService insatnces per connected user */
+  /**
+   * Does not need synchronization as only one thrread deals with a specific client at any point in time. Map holds ExecutorService instances per connected user
+   */
   private final Map<Integer, ExecutorService> notificationQueues = new HashMap<Integer, ExecutorService>();
 
   /**
