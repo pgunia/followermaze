@@ -160,11 +160,16 @@ public enum UserRegistryService {
   /**
    * Method cleans up before shutting down the server
    */
-  public void shutdown() {
+  public void reset() {
 
     // close all client sockets
     for ( Client curClient : getAllRegisteredUser() ) {
       curClient.closeConnection();
+    }
+
+    // shutdown all client specific executor queues
+    for ( ExecutorService curExecutor : notificationQueues.values() ) {
+      curExecutor.shutdownNow();
     }
 
     // clear all queues

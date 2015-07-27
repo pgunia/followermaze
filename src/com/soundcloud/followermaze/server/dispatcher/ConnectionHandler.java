@@ -76,30 +76,31 @@ abstract class ConnectionHandler implements Runnable {
     ByteBuffer resultBuffer = ByteBuffer.allocate( resultBufferSize );
     ByteBuffer tempBuffer = ByteBuffer.allocate( maxBufferSize );
 
+    boolean running = true;
     try {
-      while ( true ) {
+      while ( running ) {
 
         int bytesRead = clientSocket.read( tempBuffer );
         bytesReadTotal += bytesRead;
         if ( bytesRead == -1 ) {
           logger.trace( "No more bytes read from socket." );
-          break;
-        }
+          running = false;
+        } else {
+          // flip Buffer before reading
+          tempBuffer.flip();
 
-        // flip Buffer before reading
-        tempBuffer.flip();
+          for ( int i = 0; i < bytesRead; i++ ) {
+            final byte curByte = tempBuffer.get( i );
+            resultBuffer.put( curByte );
 
-        for ( int i = 0; i < bytesRead; i++ ) {
-          final byte curByte = tempBuffer.get( i );
-          resultBuffer.put( curByte );
-
-          // message completely read?
-          if ( curByte == MESSAGE_TERMINATOR ) {
-            processMessage( resultBuffer );
-            resultBuffer.clear();
+            // message completely read?
+            if ( curByte == MESSAGE_TERMINATOR ) {
+              processMessage( resultBuffer );
+              resultBuffer.clear();
+            }
           }
+          tempBuffer.clear();
         }
-        tempBuffer.clear();
       }
     } catch ( Exception ex ) {
       throw ex;

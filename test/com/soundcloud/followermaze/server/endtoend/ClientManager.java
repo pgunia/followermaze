@@ -31,16 +31,18 @@ public class ClientManager {
   /** Executor service that connects the clients to the sever by calling their run() method */
   private ExecutorService connectionExecutor = null;
 
+  private CountDownLatch clientTimeoutLatch = null;
+
   /**
    * Creates a configured number of clients and connected them to the server on the specified port
    * 
    * @param port
    *          Port on which the clients connect to the server
    */
-  public CountDownLatch connectClients( final int port ) {
+  public void connectClients( final int port ) {
     connectionExecutor = Executors.newFixedThreadPool( NUMBER_OF_CLIENTS );
     final CountDownLatch registerClientsLatch = new CountDownLatch( NUMBER_OF_CLIENTS );
-    final CountDownLatch clientTimeoutLatch = new CountDownLatch( NUMBER_OF_CLIENTS );
+    clientTimeoutLatch = new CountDownLatch( NUMBER_OF_CLIENTS );
     for ( int i = 0; i < NUMBER_OF_CLIENTS; i++ ) {
       final ClientSocket client = createClient( i, port, registerClientsLatch, clientTimeoutLatch );
       clients.add( client );
@@ -51,7 +53,6 @@ public class ClientManager {
     } catch ( InterruptedException e ) {
       logger.error( "Error while registering clients!", e );
     }
-    return clientTimeoutLatch;
   }
 
   /**
@@ -72,11 +73,26 @@ public class ClientManager {
 
   public void disconnectAllClients() {
 
+    // disconnect all clients
+    for ( ClientSocket client : clients ) {
+      client.disconnect();
+    }
+
+    // shutdonw executor
     connectionExecutor.shutdown();
     try {
       connectionExecutor.awaitTermination( SHUTDOWN_TIMEOUT, TimeUnit.MILLISECONDS );
     } catch ( InterruptedException e ) {
       logger.error( "Error while shutting down client executor!", e );
     }
+
+    clients.clear();
+  }
+
+  /**
+   * @return Getter for timeout latch used to wait until all clients have disconnected from server
+   */
+  public CountDownLatch getClientTimeOutLatch() {
+    return clientTimeoutLatch;
   }
 }

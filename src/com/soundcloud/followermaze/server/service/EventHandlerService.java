@@ -85,9 +85,10 @@ public enum EventHandlerService {
   }
 
   /**
-   * Clears the event queue
+   * Resets the handler to its startup state
    */
-  public void shutdown() {
+  public void reset() {
     eventQueue.clear();
+    nextSequenceNumber = 1;
   }
 }

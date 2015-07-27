@@ -26,6 +26,7 @@ public class EventFactory {
       eventTypeIdentifier = components[1];
     } catch ( ArrayIndexOutOfBoundsException ex ) {
       logger.error( "Invalid event: " + eventStr, ex );
+      return null;
     }
     Event result = null;
     try {

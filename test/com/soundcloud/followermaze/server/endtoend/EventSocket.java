@@ -21,7 +21,7 @@ public class EventSocket extends BaseSocket {
 
     // send all messages in the list to the server
     for ( final String message : messagesToSend ) {
-      logger.info( "Sending message " + message );
+      logger.debug( "Sending message " + message );
       final CharBuffer buffer = CharBuffer.wrap( message );
       try {
         while ( buffer.hasRemaining() ) {

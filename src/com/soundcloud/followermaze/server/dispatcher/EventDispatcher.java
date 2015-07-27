@@ -56,11 +56,11 @@ public class EventDispatcher extends BaseDispatcher {
     } finally {
       try {
         cleanUp();
-        logger.info( "Closing sockets..." );
+        logger.info( "Closing Server Socket..." );
         serverSocket.close();
-        logger.info( "Closing sockets...completed" );
+        logger.info( "Closing Server Socket...completed" );
         logger.info( "Shutting down executor service..." );
-        executorService.shutdown();
+        executorService.shutdownNow();
         logger.info( "Shutting down executor service...completed" );
       } catch ( IOException e ) {
         logger.error( "Error during component shutdown.", e );
@@ -72,6 +72,6 @@ public class EventDispatcher extends BaseDispatcher {
   @Override
   void cleanUp() {
     // shut down EventHandlerService
-    EventHandlerService.INSTANCE.shutdown();
+    EventHandlerService.INSTANCE.reset();
   }
 }

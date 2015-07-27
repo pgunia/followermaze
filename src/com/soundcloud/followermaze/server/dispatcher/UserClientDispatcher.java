@@ -39,11 +39,11 @@ class UserClientDispatcher extends BaseDispatcher {
     } finally {
       try {
         cleanUp();
-        logger.info( "Closing sockets..." );
+        logger.info( "Closing Server Socket..." );
         serverSocket.close();
-        logger.info( "Closing sockets...completed" );
+        logger.info( "Closing Server Socket...completed" );
         logger.info( "Shutting down executor service..." );
-        executorService.shutdown();
+        executorService.shutdownNow();
         logger.info( "Shutting down executor service...completed" );
       } catch ( Exception e ) {
         logger.error( "Error during component shutdown.", e );
@@ -53,6 +53,6 @@ class UserClientDispatcher extends BaseDispatcher {
 
   @Override
   void cleanUp() {
-    UserRegistryService.INSTANCE.shutdown();
+    UserRegistryService.INSTANCE.reset();
   }
 }

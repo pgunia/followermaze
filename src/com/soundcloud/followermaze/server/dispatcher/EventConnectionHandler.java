@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.soundcloud.followermaze.server.config.ConfigService;
 import com.soundcloud.followermaze.server.service.EventHandlerService;
+import com.soundlcoud.followermaze.server.model.event.Event;
 import com.soundlcoud.followermaze.server.model.event.EventFactory;
 
 /**
@@ -49,7 +50,11 @@ public class EventConnectionHandler extends ConnectionHandler {
     final String messageStr = new String( byteBuffer, ENCODING );
     logger.debug( "Processing message: " + messageStr );
 
-    EventHandlerService.INSTANCE.addEvent( EventFactory.createEvent( messageStr ) );
+    final Event event = EventFactory.createEvent( messageStr );
+    if ( event != null ) {
+      EventHandlerService.INSTANCE.addEvent( EventFactory.createEvent( messageStr ) );
+    }
+
     logger.exit();
   }
 

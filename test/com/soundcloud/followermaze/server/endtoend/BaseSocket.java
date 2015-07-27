@@ -1,5 +1,6 @@
 package com.soundcloud.followermaze.server.endtoend;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
@@ -27,14 +28,12 @@ public abstract class BaseSocket implements Runnable {
     logger.exit();
   }
 
-  /**
-   * Returns whether or not the current socket is connected to a server
-   * 
-   * @return
-   */
-  public boolean isConnected() {
-    return clientSocket.isConnected();
-
+  public void disconnect() {
+    try {
+      clientSocket.close();
+    } catch ( IOException e ) {
+      logger.error( "Error closing socket connection!", e );
+    }
   }
 
 }
