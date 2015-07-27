@@ -47,20 +47,23 @@ public class Client {
    * 
    * @param messageStr
    *          Message to be sent to the user
+   * @return TODO
    */
-  public void notify( String messageStr ) {
+  public int notify( String messageStr ) {
 
     logger.entry( messageStr );
+    int bytesWritten = 0;
     try {
       logger.debug( "Sending message " + messageStr + " to " + id );
-      int bytesWritten = clientSocket.write( Charset.forName( CHARSET ).encode( messageStr ) );
+      bytesWritten = clientSocket.write( Charset.forName( CHARSET ).encode( messageStr ) );
       logger.debug( "Sent " + bytesWritten + " bytes to client!" );
     } catch ( Exception e ) {
       // Client is no longer connected, remove it from the userregistry
       logger.error( "Error notifying client.", e );
       UserRegistryService.INSTANCE.removeClient( this );
     }
-    logger.exit();
+    logger.exit( bytesWritten );
+    return bytesWritten;
   }
 
   /**
@@ -68,7 +71,9 @@ public class Client {
    */
   public void closeConnection() {
     try {
-      clientSocket.close();
+      if ( clientSocket != null ) {
+        clientSocket.close();
+      }
     } catch ( IOException e ) {
       logger.error( "Error closing sokcet to client " + getId(), e );
     }

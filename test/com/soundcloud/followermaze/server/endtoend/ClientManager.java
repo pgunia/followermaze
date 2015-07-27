@@ -31,6 +31,7 @@ public class ClientManager {
   /** Executor service that connects the clients to the sever by calling their run() method */
   private ExecutorService connectionExecutor = null;
 
+  /** CountDownLatch is used to synchronize based on client disconnects due to connection timeouts */
   private CountDownLatch clientTimeoutLatch = null;
 
   /**
@@ -71,6 +72,9 @@ public class ClientManager {
     return new ClientSocket( id, port, registerClientLatch, clientTimeoutLatch );
   }
 
+  /**
+   * Disconnects all connected clients by closing their sockect connections and then shutting down the executor that runs the listening threads
+   */
   public void disconnectAllClients() {
 
     // disconnect all clients
@@ -94,5 +98,28 @@ public class ClientManager {
    */
   public CountDownLatch getClientTimeOutLatch() {
     return clientTimeoutLatch;
+  }
+
+  /**
+   * @return Getter for all connected ClientSocket instances
+   */
+  public List<ClientSocket> getClients() {
+    return clients;
+  }
+
+  /**
+   * Returns the client with the passed in id
+   * 
+   * @param id
+   *          Id of the client that should be returned
+   * @return ClientSocket if client can be found, else null
+   */
+  public ClientSocket getClientById( int id ) {
+    for ( ClientSocket curClient : clients ) {
+      if ( curClient.getUserId() == id ) {
+        return curClient;
+      }
+    }
+    return null;
   }
 }

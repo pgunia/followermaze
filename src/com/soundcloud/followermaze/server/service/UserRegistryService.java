@@ -50,6 +50,13 @@ public enum UserRegistryService {
     logger.exit();
   }
 
+  /**
+   * Returns a registered client by its ID
+   * 
+   * @param id
+   *          ID of registered client
+   * @return Client instance containingt the socket object
+   */
   public Client getClientById( final Integer id ) {
     return registeredClients.get( id );
   }

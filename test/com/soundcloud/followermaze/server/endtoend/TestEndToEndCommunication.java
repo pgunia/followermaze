@@ -32,9 +32,6 @@ public class TestEndToEndCommunication {
   /** Port on which the event source connects to the server */
   final static int EVENT_SOURCE_PORT = 9090;
 
-  /** Time to wait for the server to start up before starting the tests */
-  final static long RAMP_UP_SERVER_WAIT_TIME = 1000;
-
   /** Handles startup and shutodnw of server instances */
   private static ServerManager serverManager = null;
 
@@ -65,7 +62,6 @@ public class TestEndToEndCommunication {
   @After
   public void tearDown() throws Exception {
     reset();
-    clientManager = null;
   }
 
   @Test
@@ -117,11 +113,11 @@ public class TestEndToEndCommunication {
       // compare the send and retrieved messages for both clients
       final String send1 = messagesRetrievedClient1.toString();
       final String retrieved1 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 1 );
-      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send1 + " , Retrieved: " + retrieved1 + " END", send1.equals( retrieved1 ) );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send1 + "END , Retrieved: " + retrieved1 + " END", send1.equals( retrieved1 ) );
 
       final String send2 = messagesRetrievedClient2.toString();
       final String retrieved2 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 2 );
-      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send2 + " , Retrieved: " + retrieved2 + " END", send2.equals( retrieved2 ) );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send2 + "END , Retrieved: " + retrieved2 + " END", send2.equals( retrieved2 ) );
 
     } catch ( Exception e ) {
       logger.error( "Error during test execution!", e );
@@ -199,8 +195,16 @@ public class TestEndToEndCommunication {
 
     try {
       final List<String> messagesSent = new ArrayList<String>();
-      messagesSent.add( "1|B|1|2" + MESSAGE_TERMINATOR );
-      messagesSent.add( "2|B|2|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "1|B" + MESSAGE_TERMINATOR );
+      messagesSent.add( "2|B" + MESSAGE_TERMINATOR );
+
+      final StringBuilder resultBuilder = new StringBuilder( "" );
+      for ( String cur : messagesSent ) {
+        resultBuilder.append( cur );
+      }
+      final String result = resultBuilder.toString();
+
+      Collections.shuffle( messagesSent );
 
       // create Event Source, that sends the messages to the server
       final BaseSocket eventSource = new EventSocket( messagesSent, EVENT_SOURCE_PORT );
@@ -215,12 +219,320 @@ public class TestEndToEndCommunication {
         logger.error( "Error while waiting for clients to disconnect!", e );
       }
 
+      // all connected clients should have received the same message, iterate them
+      for ( ClientSocket curClient : clientManager.getClients() ) {
+        final int curUserId = curClient.getUserId();
+        final String receivedMessages = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( curUserId );
+        assertTrue( "ERROR: Messages send to user " + curClient.getUserId() + ": " + result + "END, retrieved: " + receivedMessages + "END", result.equals( receivedMessages ) );
+      }
+
     } catch ( Exception e ) {
       logger.error( "Error during test execution!", e );
     } finally {
       eventSourceThread.interrupt();
       logger.info( "Testing Broadcast Meesage Handling...done" );
     }
+  }
+
+  @Test
+  public void testPrivateMessageHandling() {
+
+    logger.info( "Testing Private Message Handling..." );
+    Thread eventSourceThread = null;
+
+    try {
+      final List<String> messagesSent = new ArrayList<String>();
+      messagesSent.add( "1|P|1|2" + MESSAGE_TERMINATOR );
+      messagesSent.add( "2|P|2|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "3|P|3|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "4|P|4|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "5|P|5|2" + MESSAGE_TERMINATOR );
+      messagesSent.add( "6|P|6|2" + MESSAGE_TERMINATOR );
+
+      // shuffle the message list to simulate unordered message sending
+      Collections.shuffle( messagesSent );
+      final StringBuilder messagesRetrievedClient1 = new StringBuilder( "" );
+      final StringBuilder messagesRetrievedClient2 = new StringBuilder( "" );
+
+      // messages for client 1
+      messagesRetrievedClient1.append( "2|P|2|1" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient1.append( "3|P|3|1" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient1.append( "4|P|4|1" + MESSAGE_TERMINATOR );
+
+      // messages for client 2
+      messagesRetrievedClient2.append( "1|P|1|2" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient2.append( "5|P|5|2" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient2.append( "6|P|6|2" + MESSAGE_TERMINATOR );
+
+      // create Event Source, that sends the messages to the server
+      final BaseSocket eventSource = new EventSocket( messagesSent, EVENT_SOURCE_PORT );
+      logger.info( "Start sending events to server..." );
+
+      eventSourceThread = new Thread( eventSource );
+      eventSourceThread.start();
+
+      try {
+        clientManager.getClientTimeOutLatch().await();
+      } catch ( InterruptedException e ) {
+        logger.error( "Error while waiting for clients to disconnect!", e );
+      }
+
+      // compare the send and retrieved messages for both clients
+      final String send1 = messagesRetrievedClient1.toString();
+      final String retrieved1 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 1 );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send1 + "END , Retrieved: " + retrieved1 + " END", send1.equals( retrieved1 ) );
+
+      final String send2 = messagesRetrievedClient2.toString();
+      final String retrieved2 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 2 );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send2 + "END , Retrieved: " + retrieved2 + " END", send2.equals( retrieved2 ) );
+
+    } catch ( Exception e ) {
+      logger.error( "Error during test execution!", e );
+    } finally {
+      eventSourceThread.interrupt();
+      logger.info( "Testing Private Message Handling...done" );
+    }
+  }
+
+  @Test
+  public void testStatusUpdateMessageHandling() {
+    logger.entry();
+    logger.info( "Testing Follow Message Handling..." );
+
+    Thread eventSourceThread = null;
+
+    try {
+
+      // first create of follower / followed structures
+      final List<String> messagesSent = new ArrayList<String>();
+      messagesSent.add( "1|F|1|2" + MESSAGE_TERMINATOR );
+      messagesSent.add( "2|F|2|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "3|F|3|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "4|F|4|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "5|F|5|2" + MESSAGE_TERMINATOR );
+      messagesSent.add( "6|F|6|2" + MESSAGE_TERMINATOR );
+
+      // now send some status updates
+      messagesSent.add( "7|S|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "8|S|2" + MESSAGE_TERMINATOR );
+
+      // send some unfollow messages to change the follower / followed structure
+      messagesSent.add( "9|U|1|2" + MESSAGE_TERMINATOR );
+      messagesSent.add( "10|U|3|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "11|U|5|2" + MESSAGE_TERMINATOR );
+
+      // send some more status updates
+      messagesSent.add( "12|S|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "13|S|2" + MESSAGE_TERMINATOR );
+
+      // shuffle the message list to simulate unordered message sending
+      Collections.shuffle( messagesSent );
+
+      // prepare the
+      final StringBuilder messagesRetrievedClient1 = new StringBuilder( "" );
+      final StringBuilder messagesRetrievedClient2 = new StringBuilder( "" );
+      final StringBuilder messagesRetrievedClient3 = new StringBuilder( "" );
+      final StringBuilder messagesRetrievedClient4 = new StringBuilder( "" );
+      final StringBuilder messagesRetrievedClient5 = new StringBuilder( "" );
+      final StringBuilder messagesRetrievedClient6 = new StringBuilder( "" );
+
+      // messages for client 1
+      messagesRetrievedClient1.append( "2|F|2|1" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient1.append( "3|F|3|1" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient1.append( "4|F|4|1" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient1.append( "8|S|2" + MESSAGE_TERMINATOR );
+
+      // messages for client 2
+      messagesRetrievedClient2.append( "1|F|1|2" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient2.append( "5|F|5|2" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient2.append( "6|F|6|2" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient2.append( "7|S|1" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient2.append( "12|S|1" + MESSAGE_TERMINATOR );
+
+      // messages for client 3
+      messagesRetrievedClient3.append( "7|S|1" + MESSAGE_TERMINATOR );
+
+      // messages for client 4
+      messagesRetrievedClient4.append( "7|S|1" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient4.append( "12|S|1" + MESSAGE_TERMINATOR );
+
+      // messages for client 5
+      messagesRetrievedClient5.append( "8|S|2" + MESSAGE_TERMINATOR );
+
+      // messages for client 6
+      messagesRetrievedClient6.append( "8|S|2" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient6.append( "13|S|2" + MESSAGE_TERMINATOR );
+
+      // create Event Source, that sends the messages to the server
+      final BaseSocket eventSource = new EventSocket( messagesSent, EVENT_SOURCE_PORT );
+      logger.info( "Start sending events to server..." );
+
+      eventSourceThread = new Thread( eventSource );
+      eventSourceThread.start();
+
+      try {
+        clientManager.getClientTimeOutLatch().await();
+      } catch ( InterruptedException e ) {
+        logger.error( "Error while waiting for clients to disconnect!", e );
+      }
+
+      // compare the send and retrieved messages for both clients
+      final String send1 = messagesRetrievedClient1.toString();
+      final String retrieved1 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 1 );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send1 + "END , Retrieved: " + retrieved1 + " END", send1.equals( retrieved1 ) );
+
+      final String send2 = messagesRetrievedClient2.toString();
+      final String retrieved2 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 2 );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send2 + "END , Retrieved: " + retrieved2 + " END", send2.equals( retrieved2 ) );
+
+      final String send3 = messagesRetrievedClient3.toString();
+      final String retrieved3 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 3 );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send3 + "END , Retrieved: " + retrieved3 + " END", send3.equals( retrieved3 ) );
+
+      final String send4 = messagesRetrievedClient4.toString();
+      final String retrieved4 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 4 );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send4 + "END , Retrieved: " + retrieved4 + " END", send4.equals( retrieved4 ) );
+
+      final String send5 = messagesRetrievedClient5.toString();
+      final String retrieved5 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 5 );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send5 + "END , Retrieved: " + retrieved5 + " END", send5.equals( retrieved5 ) );
+
+      final String send6 = messagesRetrievedClient6.toString();
+      final String retrieved6 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 6 );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send6 + "END , Retrieved: " + retrieved6 + " END", send6.equals( retrieved6 ) );
+
+    } catch ( Exception e ) {
+      logger.error( "Error during test execution!", e );
+    } finally {
+      eventSourceThread.interrupt();
+      logger.info( "Testing Follow Message Handling...done" );
+    }
+    logger.exit();
+
+  }
+
+  @Test
+  public void testInvalidMessageHandling() {
+    logger.entry();
+    logger.info( "Testing Follow Message Handling..." );
+
+    Thread eventSourceThread = null;
+
+    try {
+
+      // first generate some valid messages that will cause a valid output
+      final List<String> messagesSent = new ArrayList<String>();
+      messagesSent.add( "1|F|1|2" + MESSAGE_TERMINATOR );
+      messagesSent.add( "2|F|2|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "3|F|3|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "4|F|4|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "5|F|5|2" + MESSAGE_TERMINATOR );
+      messagesSent.add( "6|F|6|2" + MESSAGE_TERMINATOR );
+
+      // now send some status updates
+      messagesSent.add( "7|S|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "8|S|2" + MESSAGE_TERMINATOR );
+
+      // send some unfollow messages to change the follower / followed structure
+      messagesSent.add( "9|U|1|2" + MESSAGE_TERMINATOR );
+      messagesSent.add( "10|U|3|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "11|U|5|2" + MESSAGE_TERMINATOR );
+
+      // send some more status updates
+      messagesSent.add( "12|S|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "13|S|2" + MESSAGE_TERMINATOR );
+
+      // add some error messages, either of wrong format or content, this should not change the server behaviour in any way, the result should be valid
+      messagesSent.add( "ERROR" + MESSAGE_TERMINATOR );
+      messagesSent.add( "333|B|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "823|F|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "217|P|1" + MESSAGE_TERMINATOR );
+      messagesSent.add( "8|S|32|1" + MESSAGE_TERMINATOR );
+
+      // shuffle the message list to simulate unordered message sending
+      Collections.shuffle( messagesSent );
+
+      // prepare the
+      final StringBuilder messagesRetrievedClient1 = new StringBuilder( "" );
+      final StringBuilder messagesRetrievedClient2 = new StringBuilder( "" );
+      final StringBuilder messagesRetrievedClient3 = new StringBuilder( "" );
+      final StringBuilder messagesRetrievedClient4 = new StringBuilder( "" );
+      final StringBuilder messagesRetrievedClient5 = new StringBuilder( "" );
+      final StringBuilder messagesRetrievedClient6 = new StringBuilder( "" );
+
+      // messages for client 1
+      messagesRetrievedClient1.append( "2|F|2|1" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient1.append( "3|F|3|1" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient1.append( "4|F|4|1" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient1.append( "8|S|2" + MESSAGE_TERMINATOR );
+
+      // messages for client 2
+      messagesRetrievedClient2.append( "1|F|1|2" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient2.append( "5|F|5|2" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient2.append( "6|F|6|2" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient2.append( "7|S|1" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient2.append( "12|S|1" + MESSAGE_TERMINATOR );
+
+      // messages for client 3
+      messagesRetrievedClient3.append( "7|S|1" + MESSAGE_TERMINATOR );
+
+      // messages for client 4
+      messagesRetrievedClient4.append( "7|S|1" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient4.append( "12|S|1" + MESSAGE_TERMINATOR );
+
+      // messages for client 5
+      messagesRetrievedClient5.append( "8|S|2" + MESSAGE_TERMINATOR );
+
+      // messages for client 6
+      messagesRetrievedClient6.append( "8|S|2" + MESSAGE_TERMINATOR );
+      messagesRetrievedClient6.append( "13|S|2" + MESSAGE_TERMINATOR );
+
+      // create Event Source, that sends the messages to the server
+      final BaseSocket eventSource = new EventSocket( messagesSent, EVENT_SOURCE_PORT );
+      logger.info( "Start sending events to server..." );
+
+      eventSourceThread = new Thread( eventSource );
+      eventSourceThread.start();
+
+      try {
+        clientManager.getClientTimeOutLatch().await();
+      } catch ( InterruptedException e ) {
+        logger.error( "Error while waiting for clients to disconnect!", e );
+      }
+
+      // compare the send and retrieved messages for both clients
+      final String send1 = messagesRetrievedClient1.toString();
+      final String retrieved1 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 1 );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send1 + "END , Retrieved: " + retrieved1 + " END", send1.equals( retrieved1 ) );
+
+      final String send2 = messagesRetrievedClient2.toString();
+      final String retrieved2 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 2 );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send2 + "END , Retrieved: " + retrieved2 + " END", send2.equals( retrieved2 ) );
+
+      final String send3 = messagesRetrievedClient3.toString();
+      final String retrieved3 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 3 );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send3 + "END , Retrieved: " + retrieved3 + " END", send3.equals( retrieved3 ) );
+
+      final String send4 = messagesRetrievedClient4.toString();
+      final String retrieved4 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 4 );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send4 + "END , Retrieved: " + retrieved4 + " END", send4.equals( retrieved4 ) );
+
+      final String send5 = messagesRetrievedClient5.toString();
+      final String retrieved5 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 5 );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send5 + "END , Retrieved: " + retrieved5 + " END", send5.equals( retrieved5 ) );
+
+      final String send6 = messagesRetrievedClient6.toString();
+      final String retrieved6 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 6 );
+      assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send6 + "END , Retrieved: " + retrieved6 + " END", send6.equals( retrieved6 ) );
+
+    } catch ( Exception e ) {
+      logger.error( "Error during test execution!", e );
+    } finally {
+      eventSourceThread.interrupt();
+      logger.info( "Testing Follow Message Handling...done" );
+    }
+    logger.exit();
+
   }
 
   /**
@@ -230,5 +542,6 @@ public class TestEndToEndCommunication {
     clientManager.disconnectAllClients();
     serverManager.resetServers();
     TestCoordinatorService.INSTANCE.clear();
+    clientManager = null;
   }
 }

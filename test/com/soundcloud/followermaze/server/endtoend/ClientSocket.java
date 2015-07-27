@@ -67,7 +67,7 @@ public class ClientSocket extends BaseSocket {
    */
   private boolean registerAtServer() {
     logger.entry();
-    logger.info( "Register User at server" );
+    logger.debug( "Register User at server" );
     try {
       final CharBuffer buffer = CharBuffer.wrap( String.valueOf( userId ) + MESSAGE_TERMINATOR );
 
@@ -79,7 +79,7 @@ public class ClientSocket extends BaseSocket {
       logger.exit( false );
       return false;
     }
-    logger.info( "Registered " + userId );
+    logger.debug( "Registered " + userId );
     logger.exit( true );
     return true;
   }
@@ -134,4 +134,13 @@ public class ClientSocket extends BaseSocket {
     logger.exit();
     return messageBuffer.toString();
   }
+
+  /**
+   * 
+   * @return Id of connected user
+   */
+  public int getUserId() {
+    return userId;
+  }
+
 }
