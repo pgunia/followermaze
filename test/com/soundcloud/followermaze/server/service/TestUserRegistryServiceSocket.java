@@ -14,9 +14,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.soundcloud.followermaze.helper.ClientManager;
+import com.soundcloud.followermaze.helper.ClientSocket;
+import com.soundcloud.followermaze.helper.TestCoordinatorService;
 import com.soundcloud.followermaze.server.dispatcher.ServerManager;
-import com.soundcloud.followermaze.server.endtoend.ClientManager;
-import com.soundcloud.followermaze.server.endtoend.ClientSocket;
 import com.soundcloud.followermaze.server.model.client.Client;
 
 /**
@@ -95,7 +96,7 @@ public class TestUserRegistryServiceSocket {
 
     // check if the client is registered
     final Client client = userReg.getClientById( clientId );
-    assertTrue( "Error: Client with ID 1 is not registered in the user registry!", client != null );
+    assertTrue( "Error: Client with ID " + clientId + " is not registered in the user registry!", client != null );
 
     // send an arbitrary String via the clients notify method and check the number of bytes that have been written
     final String testString = "THIS IS A TESTSTRING";
@@ -111,6 +112,39 @@ public class TestUserRegistryServiceSocket {
     } catch ( InterruptedException e ) {
       logger.error( "Error while waiting for clients to disconnect!", e );
     }
+
+    // now check if the messages are equal
+    final String receivedMessage = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( clientId );
+    assertTrue( "Error: Received and expected message are not identical! Expected: " + testString + ", received: " + receivedMessage, testString.equals( receivedMessage ) );
+  }
+
+  /**
+   * Retrieves a user from the User Registry and sends a string using the addNotificationJob method from the UserRegistryService, thus the message takes more steps compared to directly sending the
+   * message as in testClientNotify()
+   */
+  @Test
+  public void testAddNotificationJob() {
+
+    final UserRegistryService userReg = UserRegistryService.INSTANCE;
+    final int clientId = 1;
+
+    // check if the client is registered
+    final Client client = userReg.getClientById( clientId );
+    assertTrue( "Error: Client with ID " + clientId + " is not registered in the user registry!", client != null );
+
+    // send an arbitrary String via the clients notify method and check the number of bytes that have been written
+    final String testString = "THIS IS A TESTSTRING";
+
+    // send message via UserRegistryService
+    userReg.addNotificationJob( testString, client );
+    try {
+      clientManager.getClientTimeOutLatch().await();
+    } catch ( InterruptedException e ) {
+      logger.error( "Error while waiting for clients to disconnect!", e );
+    }
+
+    final String receivedMessage = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( clientId );
+    assertTrue( "Error: Expected message: " + testString + ", received message" + receivedMessage, testString.equals( receivedMessage ) );
 
   }
 }

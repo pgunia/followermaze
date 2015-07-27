@@ -1,4 +1,4 @@
-package com.soundcloud.followermaze.server.endtoend;
+package com.soundcloud.followermaze.helper;
 
 import java.io.IOException;
 import java.nio.CharBuffer;
@@ -10,7 +10,7 @@ public class EventSocket extends BaseSocket {
   /** List holds all messages to be sent to the Server */
   private final List<String> messagesToSend;
 
-  EventSocket( final List<String> messageList, int port ) {
+  public EventSocket( final List<String> messageList, int port ) {
     super( port );
     messagesToSend = messageList;
   }

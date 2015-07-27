@@ -5,7 +5,7 @@ import java.util.concurrent.CountDownLatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.soundcloud.followermaze.server.endtoend.ClientManager;
+import com.soundcloud.followermaze.helper.ClientManager;
 import com.soundcloud.followermaze.server.service.EventHandlerService;
 import com.soundcloud.followermaze.server.service.UserRegistryService;
 

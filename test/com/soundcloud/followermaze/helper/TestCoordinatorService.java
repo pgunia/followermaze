@@ -1,4 +1,4 @@
-package com.soundcloud.followermaze.server.endtoend;
+package com.soundcloud.followermaze.helper;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

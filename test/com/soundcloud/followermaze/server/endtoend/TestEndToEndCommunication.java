@@ -14,6 +14,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.soundcloud.followermaze.helper.BaseSocket;
+import com.soundcloud.followermaze.helper.ClientManager;
+import com.soundcloud.followermaze.helper.ClientSocket;
+import com.soundcloud.followermaze.helper.EventSocket;
+import com.soundcloud.followermaze.helper.TestCoordinatorService;
 import com.soundcloud.followermaze.server.dispatcher.ServerManager;
 
 /**
