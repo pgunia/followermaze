@@ -55,7 +55,7 @@ public class ClientSocket extends BaseSocket {
       connectedLatch.countDown();
       final String result = retrieveMessages();
       if ( result.length() > 0 ) {
-        TestCoordinatorService.INSTANCE.addRetrievedMessages( userId, result );
+        CoordinatorService.INSTANCE.addRetrievedMessages( userId, result );
       }
     }
   }

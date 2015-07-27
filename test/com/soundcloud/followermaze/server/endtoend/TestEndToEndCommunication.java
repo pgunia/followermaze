@@ -18,7 +18,7 @@ import com.soundcloud.followermaze.helper.BaseSocket;
 import com.soundcloud.followermaze.helper.ClientManager;
 import com.soundcloud.followermaze.helper.ClientSocket;
 import com.soundcloud.followermaze.helper.EventSocket;
-import com.soundcloud.followermaze.helper.TestCoordinatorService;
+import com.soundcloud.followermaze.helper.CoordinatorService;
 import com.soundcloud.followermaze.server.dispatcher.ServerManager;
 
 /**
@@ -117,11 +117,11 @@ public class TestEndToEndCommunication {
 
       // compare the send and retrieved messages for both clients
       final String send1 = messagesRetrievedClient1.toString();
-      final String retrieved1 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 1 );
+      final String retrieved1 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 1 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send1 + "END , Retrieved: " + retrieved1 + " END", send1.equals( retrieved1 ) );
 
       final String send2 = messagesRetrievedClient2.toString();
-      final String retrieved2 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 2 );
+      final String retrieved2 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 2 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send2 + "END , Retrieved: " + retrieved2 + " END", send2.equals( retrieved2 ) );
 
     } catch ( Exception e ) {
@@ -166,22 +166,22 @@ public class TestEndToEndCommunication {
       }
 
       // compare the send and retrieved messages for both clients
-      final String retrieved1 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 1 );
+      final String retrieved1 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 1 );
       assertTrue( "ERROR: Messages retrieved for User 1!" + retrieved1, retrieved1 == null );
 
-      final String retrieved2 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 2 );
+      final String retrieved2 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 2 );
       assertTrue( "ERROR: Messages retrieved for User 2!", retrieved2 == null );
 
-      final String retrieved3 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 3 );
+      final String retrieved3 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 3 );
       assertTrue( "ERROR: Messages retrieved for User 3!" + retrieved3, retrieved3 == null );
 
-      final String retrieved4 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 4 );
+      final String retrieved4 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 4 );
       assertTrue( "ERROR: Messages retrieved for User 4!", retrieved4 == null );
 
-      final String retrieved5 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 5 );
+      final String retrieved5 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 5 );
       assertTrue( "ERROR: Messages retrieved for User 5!" + retrieved5, retrieved5 == null );
 
-      final String retrieved6 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 6 );
+      final String retrieved6 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 6 );
       assertTrue( "ERROR: Messages retrieved for User 6!", retrieved6 == null );
 
     } catch ( Exception e ) {
@@ -227,7 +227,7 @@ public class TestEndToEndCommunication {
       // all connected clients should have received the same message, iterate them
       for ( ClientSocket curClient : clientManager.getClients() ) {
         final int curUserId = curClient.getUserId();
-        final String receivedMessages = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( curUserId );
+        final String receivedMessages = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( curUserId );
         assertTrue( "ERROR: Messages send to user " + curClient.getUserId() + ": " + result + "END, retrieved: " + receivedMessages + "END", result.equals( receivedMessages ) );
       }
 
@@ -284,11 +284,11 @@ public class TestEndToEndCommunication {
 
       // compare the send and retrieved messages for both clients
       final String send1 = messagesRetrievedClient1.toString();
-      final String retrieved1 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 1 );
+      final String retrieved1 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 1 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send1 + "END , Retrieved: " + retrieved1 + " END", send1.equals( retrieved1 ) );
 
       final String send2 = messagesRetrievedClient2.toString();
-      final String retrieved2 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 2 );
+      final String retrieved2 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 2 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send2 + "END , Retrieved: " + retrieved2 + " END", send2.equals( retrieved2 ) );
 
     } catch ( Exception e ) {
@@ -383,27 +383,27 @@ public class TestEndToEndCommunication {
 
       // compare the send and retrieved messages for both clients
       final String send1 = messagesRetrievedClient1.toString();
-      final String retrieved1 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 1 );
+      final String retrieved1 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 1 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send1 + "END , Retrieved: " + retrieved1 + " END", send1.equals( retrieved1 ) );
 
       final String send2 = messagesRetrievedClient2.toString();
-      final String retrieved2 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 2 );
+      final String retrieved2 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 2 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send2 + "END , Retrieved: " + retrieved2 + " END", send2.equals( retrieved2 ) );
 
       final String send3 = messagesRetrievedClient3.toString();
-      final String retrieved3 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 3 );
+      final String retrieved3 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 3 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send3 + "END , Retrieved: " + retrieved3 + " END", send3.equals( retrieved3 ) );
 
       final String send4 = messagesRetrievedClient4.toString();
-      final String retrieved4 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 4 );
+      final String retrieved4 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 4 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send4 + "END , Retrieved: " + retrieved4 + " END", send4.equals( retrieved4 ) );
 
       final String send5 = messagesRetrievedClient5.toString();
-      final String retrieved5 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 5 );
+      final String retrieved5 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 5 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send5 + "END , Retrieved: " + retrieved5 + " END", send5.equals( retrieved5 ) );
 
       final String send6 = messagesRetrievedClient6.toString();
-      final String retrieved6 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 6 );
+      final String retrieved6 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 6 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send6 + "END , Retrieved: " + retrieved6 + " END", send6.equals( retrieved6 ) );
 
     } catch ( Exception e ) {
@@ -507,27 +507,27 @@ public class TestEndToEndCommunication {
 
       // compare the send and retrieved messages for both clients
       final String send1 = messagesRetrievedClient1.toString();
-      final String retrieved1 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 1 );
+      final String retrieved1 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 1 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send1 + "END , Retrieved: " + retrieved1 + " END", send1.equals( retrieved1 ) );
 
       final String send2 = messagesRetrievedClient2.toString();
-      final String retrieved2 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 2 );
+      final String retrieved2 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 2 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send2 + "END , Retrieved: " + retrieved2 + " END", send2.equals( retrieved2 ) );
 
       final String send3 = messagesRetrievedClient3.toString();
-      final String retrieved3 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 3 );
+      final String retrieved3 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 3 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send3 + "END , Retrieved: " + retrieved3 + " END", send3.equals( retrieved3 ) );
 
       final String send4 = messagesRetrievedClient4.toString();
-      final String retrieved4 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 4 );
+      final String retrieved4 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 4 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send4 + "END , Retrieved: " + retrieved4 + " END", send4.equals( retrieved4 ) );
 
       final String send5 = messagesRetrievedClient5.toString();
-      final String retrieved5 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 5 );
+      final String retrieved5 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 5 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send5 + "END , Retrieved: " + retrieved5 + " END", send5.equals( retrieved5 ) );
 
       final String send6 = messagesRetrievedClient6.toString();
-      final String retrieved6 = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 6 );
+      final String retrieved6 = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( 6 );
       assertTrue( "ERROR: Send and retrieved messages are not equal: Send: " + send6 + "END , Retrieved: " + retrieved6 + " END", send6.equals( retrieved6 ) );
 
     } catch ( Exception e ) {
@@ -546,7 +546,7 @@ public class TestEndToEndCommunication {
   private void reset() {
     clientManager.disconnectAllClients();
     serverManager.resetServers();
-    TestCoordinatorService.INSTANCE.clear();
+    CoordinatorService.INSTANCE.clear();
     clientManager = null;
   }
 }

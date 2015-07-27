@@ -33,7 +33,7 @@ public class StatusUpdateEvent extends AbstractEvent {
         }
       }
     } else {
-      logger.warn( "There are currently no followers registered for User " + getFromUserId() );
+      logger.debug( "There are currently no followers registered for User " + getFromUserId() );
     }
     logger.exit();
   }

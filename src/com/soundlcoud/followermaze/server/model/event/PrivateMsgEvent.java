@@ -25,7 +25,7 @@ public class PrivateMsgEvent extends AbstractEvent {
     if ( toUser != null ) {
       userReg.addNotificationJob( messageStr, toUser );
     } else {
-      logger.warn( "User with Id " + getToUserId() + " is not connected." );
+      logger.debug( "User with Id " + getToUserId() + " is not connected." );
     }
     logger.exit();
   }

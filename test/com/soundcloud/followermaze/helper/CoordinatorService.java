@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Class is used to store message lists send to and retrieve from the server. Implemented using singleton enum.
  *
  */
-public enum TestCoordinatorService {
+public enum CoordinatorService {
 
   INSTANCE;
 

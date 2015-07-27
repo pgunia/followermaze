@@ -11,6 +11,11 @@ import org.apache.logging.log4j.Logger;
 import com.soundcloud.followermaze.server.config.ConfigService;
 import com.soundcloud.followermaze.server.service.UserRegistryService;
 
+/**
+ * 
+ * Instance of this class processes messages that are retrieved by clients connected on the user client port (default 9099)
+ * 
+ */
 class UserClientDispatcher extends BaseDispatcher {
 
   private static final Logger logger = LogManager.getLogger( UserClientDispatcher.class );

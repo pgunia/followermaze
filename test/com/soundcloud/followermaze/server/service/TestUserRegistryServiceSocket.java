@@ -16,7 +16,7 @@ import org.junit.Test;
 
 import com.soundcloud.followermaze.helper.ClientManager;
 import com.soundcloud.followermaze.helper.ClientSocket;
-import com.soundcloud.followermaze.helper.TestCoordinatorService;
+import com.soundcloud.followermaze.helper.CoordinatorService;
 import com.soundcloud.followermaze.server.dispatcher.ServerManager;
 import com.soundcloud.followermaze.server.model.client.Client;
 
@@ -114,7 +114,7 @@ public class TestUserRegistryServiceSocket {
     }
 
     // now check if the messages are equal
-    final String receivedMessage = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( clientId );
+    final String receivedMessage = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( clientId );
     assertTrue( "Error: Received and expected message are not identical! Expected: " + testString + ", received: " + receivedMessage, testString.equals( receivedMessage ) );
   }
 
@@ -143,7 +143,7 @@ public class TestUserRegistryServiceSocket {
       logger.error( "Error while waiting for clients to disconnect!", e );
     }
 
-    final String receivedMessage = TestCoordinatorService.INSTANCE.getRetrievedMessagesByUserId( clientId );
+    final String receivedMessage = CoordinatorService.INSTANCE.getRetrievedMessagesByUserId( clientId );
     assertTrue( "Error: Expected message: " + testString + ", received message" + receivedMessage, testString.equals( receivedMessage ) );
 
   }

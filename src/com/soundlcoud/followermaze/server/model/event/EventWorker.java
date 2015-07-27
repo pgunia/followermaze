@@ -34,7 +34,6 @@ public class EventWorker implements Runnable {
       logger.debug( "Finished processing event: " + nextEvent );
 
       currentNextSequenceNumber++;
-
       nextEvent = EventHandlerService.INSTANCE.first();
     }
     EventHandlerService.INSTANCE.setNextSequenceNumber( currentNextSequenceNumber );

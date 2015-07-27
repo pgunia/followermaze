@@ -18,6 +18,7 @@ import com.soundcloud.followermaze.server.service.UserRegistryService;
  */
 public class UserClientConnectionHandler extends ConnectionHandler {
 
+  /** Logger */
   private static final Logger logger = LogManager.getLogger( UserClientConnectionHandler.class );
 
   public UserClientConnectionHandler( SocketChannel clientSocket ) {
@@ -44,5 +45,4 @@ public class UserClientConnectionHandler extends ConnectionHandler {
   public int getMaxBufferSize() {
     return ConfigService.INSTANCE.getMaxBufferLengthClientSocketInByte();
   }
-
 }
