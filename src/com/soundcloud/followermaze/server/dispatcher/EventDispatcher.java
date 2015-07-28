@@ -41,7 +41,7 @@ public class EventDispatcher extends BaseDispatcher {
     final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     try {
-      logger.info( "EventDispatcher is waiting for incoming connections..." );
+      logger.info( "Event Dispatcher is waiting for incoming connections..." );
       // server is ready for incoming connections
       readyLatch.countDown();
       while ( running ) {

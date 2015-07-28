@@ -49,7 +49,7 @@ class UserClientDispatcher extends BaseDispatcher {
         new LinkedBlockingQueue<Runnable>() );
 
     try {
-      logger.info( "UserClientDispatcher is waiting for incoming connections..." );
+      logger.info( "User Client Dispatcher is waiting for incoming connections..." );
       // server is ready for incoming connections
       readyLatch.countDown();
       while ( running ) {
