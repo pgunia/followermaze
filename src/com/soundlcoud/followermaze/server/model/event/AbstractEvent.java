@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
  */
 public abstract class AbstractEvent implements Event, Comparable<Event> {
 
+  /** Logger */
   protected static final Logger logger = LogManager.getLogger( AbstractEvent.class );
 
   /** Sequence number of the event instance */
@@ -23,6 +24,17 @@ public abstract class AbstractEvent implements Event, Comparable<Event> {
   /** String representation of the payload of the source message */
   final String messageStr;
 
+  /**
+   * 
+   * @param sequenceNumber
+   *          Sequence number of the event
+   * @param fromUserId
+   *          From user Id of the event
+   * @param toUserId
+   *          To user Id of the event
+   * @param messageStr
+   *          Complete message string send to the server
+   */
   public AbstractEvent( Integer sequenceNumber, Integer fromUserId, Integer toUserId, String messageStr ) {
     super();
     this.sequenceNumber = sequenceNumber;

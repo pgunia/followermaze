@@ -23,10 +23,21 @@ class UserClientDispatcher extends BaseDispatcher {
   /** Logger */
   private static final Logger logger = LogManager.getLogger( UserClientDispatcher.class );
 
+  /**
+   * Constructs a UserClientDispatcher
+   * 
+   * @param port
+   *          Port on which to listen for incoming connections
+   * @param readyLatch
+   *          CountDownLatch used for synchronization
+   */
   public UserClientDispatcher( int port, final CountDownLatch readyLatch ) {
     super( port, readyLatch );
   }
 
+  /**
+   * Main processing loop, waits for incoming connections on provided port.
+   */
   @Override
   public void run() {
 

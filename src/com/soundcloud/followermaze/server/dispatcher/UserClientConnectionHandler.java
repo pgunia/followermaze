@@ -25,6 +25,9 @@ public class UserClientConnectionHandler extends ConnectionHandler {
     super( clientSocket );
   }
 
+  /**
+   * Method extracts the user id from the passed in message and registers the user at the UserRegistryService
+   */
   @Override
   void processMessage( ByteBuffer message ) throws UnsupportedEncodingException, IllegalArgumentException {
     logger.entry( message );

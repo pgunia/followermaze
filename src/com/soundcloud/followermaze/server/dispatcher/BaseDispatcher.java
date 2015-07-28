@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
  * in its subclasses.
  *
  */
-public abstract class BaseDispatcher implements Runnable, Dispatcher {
+public abstract class BaseDispatcher implements Runnable {
 
   private static final Logger logger = LogManager.getLogger( BaseDispatcher.class );
 
