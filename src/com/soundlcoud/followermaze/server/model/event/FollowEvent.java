@@ -4,7 +4,7 @@ import com.soundcloud.followermaze.server.model.client.Client;
 import com.soundcloud.followermaze.server.service.UserRegistryService;
 
 /**
- * Instances of this class represent followe events
+ * Instances of this class represent follow events.
  *
  */
 public class FollowEvent extends AbstractEvent {

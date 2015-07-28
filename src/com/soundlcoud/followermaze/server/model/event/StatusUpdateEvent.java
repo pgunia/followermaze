@@ -6,7 +6,7 @@ import com.soundcloud.followermaze.server.model.client.Client;
 import com.soundcloud.followermaze.server.service.UserRegistryService;
 
 /**
- * Instances of this class represent status update events
+ * Instances of this class represent status update events.
  * 
  */
 public class StatusUpdateEvent extends AbstractEvent {

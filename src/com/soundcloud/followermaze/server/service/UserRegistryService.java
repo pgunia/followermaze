@@ -77,8 +77,8 @@ public enum UserRegistryService {
   /**
    * Method retrieves all followers of the client
    * 
-   * @param integer
-   *          Client, whose followers have to be retrieved
+   * @param followedId
+   *          whose followers have to be retrieved
    * @return Set containing all following clients, null, if no followers have been registered
    */
   public Set<Integer> getFollowers( final Integer followedId ) {
@@ -98,9 +98,9 @@ public enum UserRegistryService {
    * Method is not thread-safe, this is not necessary because of the single-thread processing of events. No race-conditions are possible, thus the overhead and complexity of synchronization does not
    * need to be implemented. Handles processing gracefully, if the follower is already in the list, this is silently accepted.
    * 
-   * @param followed
+   * @param followedId
    *          Client who gets a new follower
-   * @param follower
+   * @param followerId
    *          Client who starts to follow antoher client
    */
   public void addFollower( final Integer followedId, final Integer followerId ) {
@@ -123,9 +123,9 @@ public enum UserRegistryService {
    * Method is not thread-safe, this is not necessary because of the single-thread processing of events. No race-conditions are possible, thus the overhead and complexity of synchronization does not
    * need to be implemented. Handles processing gracefully, if follower is not in the list, it silently accepts that.
    * 
-   * @param followed
+   * @param followedId
    *          Client who loses a follower
-   * @param follower
+   * @param followerId
    *          Client who stops following another client
    */
   public void removeFollower( final Integer followedId, final Integer followerId ) {

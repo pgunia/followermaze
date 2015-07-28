@@ -13,6 +13,10 @@ import java.util.concurrent.CountDownLatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * 
+ * Instances of this class simulate a user that connects to a server. It first registers itself and then waits for incoming messages until a configured timeout is reached.
+ */
 public class ClientSocket extends BaseSocket {
 
   /** Logger */

@@ -4,7 +4,7 @@ import com.soundcloud.followermaze.server.model.client.Client;
 import com.soundcloud.followermaze.server.service.UserRegistryService;
 
 /**
- * Instances of this class represent private message events
+ * Instances of this class represent private message event.
  *
  */
 public class PrivateMsgEvent extends AbstractEvent {

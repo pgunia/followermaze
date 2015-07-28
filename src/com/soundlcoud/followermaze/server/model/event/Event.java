@@ -1,7 +1,7 @@
 package com.soundlcoud.followermaze.server.model.event;
 
 /**
- * Interface for all events generated and processed within the server
+ * Interface for all events generated and processed within the server.
  *
  */
 public interface Event {

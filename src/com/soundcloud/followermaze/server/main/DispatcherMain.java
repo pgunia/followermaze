@@ -2,6 +2,10 @@ package com.soundcloud.followermaze.server.main;
 
 import com.soundcloud.followermaze.server.dispatcher.ServerManager;
 
+/**
+ * Main class, starts up the server.
+ *
+ */
 public class DispatcherMain {
 
   /** Event Dispatcher Port */

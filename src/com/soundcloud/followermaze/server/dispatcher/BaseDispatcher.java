@@ -33,6 +33,8 @@ public abstract class BaseDispatcher implements Runnable, Dispatcher {
    * 
    * @param port
    *          Port on which the socket channel is waiting for incoming connections
+   * @param readySignal
+   *          CountDownLatch which is used to synchronize processing until the BaseDispatcher instance is ready to accept connections
    */
   public BaseDispatcher( int port, final CountDownLatch readySignal ) {
     super();

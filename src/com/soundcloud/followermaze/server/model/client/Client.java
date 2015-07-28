@@ -97,7 +97,7 @@ public class Client {
    * 
    * @param obj
    *          object to compare to
-   * @return
+   * @return True, if the objects are equal, else false
    */
   @Override
   public boolean equals( Object obj ) {
