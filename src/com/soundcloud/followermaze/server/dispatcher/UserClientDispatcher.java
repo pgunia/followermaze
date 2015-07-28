@@ -30,11 +30,11 @@ class UserClientDispatcher extends BaseDispatcher {
   @Override
   public void run() {
 
-    final int corePoolSize = 50;
-    final int keepAliveTime = 5000;
+    final int corePoolSize = 100;
+    final int keepAliveTime = 1;
 
     // use ThreadPoolExecutor to enable loaddepending generation and starvation of threads
-    final ExecutorService executorService = new ThreadPoolExecutor( corePoolSize, ConfigService.INSTANCE.getMaxThreadsUserClientDispatcher(), keepAliveTime, TimeUnit.MILLISECONDS,
+    final ExecutorService executorService = new ThreadPoolExecutor( corePoolSize, ConfigService.INSTANCE.getMaxThreadsUserClientDispatcher(), keepAliveTime, TimeUnit.MINUTES,
         new LinkedBlockingQueue<Runnable>() );
 
     try {
