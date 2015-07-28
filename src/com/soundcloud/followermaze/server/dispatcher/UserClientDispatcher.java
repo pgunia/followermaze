@@ -20,6 +20,7 @@ import com.soundcloud.followermaze.server.service.UserRegistryService;
  */
 class UserClientDispatcher extends BaseDispatcher {
 
+  /** Logger */
   private static final Logger logger = LogManager.getLogger( UserClientDispatcher.class );
 
   public UserClientDispatcher( int port, final CountDownLatch readyLatch ) {

@@ -51,12 +51,16 @@ public class ClientSocket extends BaseSocket {
     final boolean registered = registerAtServer();
     if ( registered ) {
 
-      // decrement latch
       connectedLatch.countDown();
+
+      // decrement latch
       final String result = retrieveMessages();
       if ( result.length() > 0 ) {
         CoordinatorService.INSTANCE.addRetrievedMessages( userId, result );
       }
+
+      // Client has disconnected, count down latch
+      timeoutLatch.countDown();
     }
   }
 
@@ -97,7 +101,7 @@ public class ClientSocket extends BaseSocket {
   private String retrieveMessages() {
     logger.entry();
     final StringBuilder messageBuffer = new StringBuilder( "" );
-    ByteBuffer tempBuffer = ByteBuffer.allocate( 64 );
+    ByteBuffer tempBuffer = ByteBuffer.allocate( 32 );
     int bytesRead = 0;
     int count = 0;
 
@@ -125,7 +129,6 @@ public class ClientSocket extends BaseSocket {
       logger.error( "Error during reading from socket!", ex );
     } finally {
       try {
-        timeoutLatch.countDown();
         clientSocket.close();
       } catch ( IOException e ) {
         logger.error( "Error during socket close", e );

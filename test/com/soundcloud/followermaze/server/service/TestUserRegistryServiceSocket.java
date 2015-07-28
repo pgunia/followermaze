@@ -73,14 +73,15 @@ public class TestUserRegistryServiceSocket {
 
     // check if all clients that should be connected can be found in the user registry
     final List<ClientSocket> clients = clientManager.getClients();
-    for ( ClientSocket curClient : clients ) {
-      assertTrue( "Error: Client " + curClient.getUserId() + " is not registered in the user registry!", userReg.getClientById( curClient.getUserId() ) != null );
-    }
 
     try {
       clientManager.getClientTimeOutLatch().await();
     } catch ( InterruptedException e ) {
       logger.error( "Error while waiting for clients to disconnect!", e );
+    }
+
+    for ( ClientSocket curClient : clients ) {
+      assertTrue( "Error: Client " + curClient.getUserId() + " is not registered in the user registry!", userReg.getClientById( curClient.getUserId() ) != null );
     }
 
   }

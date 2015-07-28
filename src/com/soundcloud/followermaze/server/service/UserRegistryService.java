@@ -155,20 +155,21 @@ public enum UserRegistryService {
    *          Client to be notified
    */
   public void addNotificationJob( final String message, final Client client ) {
-
+    logger.entry();
     ExecutorService executor = notificationQueues.get( client.getId() );
     if ( executor == null ) {
       executor = Executors.newSingleThreadExecutor();
       notificationQueues.put( client.getId(), executor );
     }
     executor.submit( new ClientNotification( message, client ) );
+    logger.exit();
   }
 
   /**
    * Method cleans up before shutting down the server
    */
   public void reset() {
-
+    logger.entry();
     // close all client sockets
     for ( Client curClient : getAllRegisteredUser() ) {
       curClient.closeConnection();
@@ -183,6 +184,7 @@ public enum UserRegistryService {
     this.followers.clear();
     this.notificationQueues.clear();
     this.registeredClients.clear();
+    logger.exit();
   }
 
 }

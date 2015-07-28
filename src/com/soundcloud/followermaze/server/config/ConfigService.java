@@ -63,7 +63,7 @@ public enum ConfigService {
     defaultProperties.setProperty( MAX_THREADS_USER_CLIENT_DISPATCHER_VAR, "200" );
     defaultProperties.setProperty( MAX_BUFFER_LENGTH_EVENT_SOCKET_IN_BYTE_VAR, "1024" );
     defaultProperties.setProperty( MAX_BUFFER_LENGTH_CLIENT_SOCKET_IN_BYTE_VAR, "16" );
-    defaultProperties.setProperty( RESULT_BUFFER_LENGTH_IN_BYTE_VAR, "32" );
+    defaultProperties.setProperty( RESULT_BUFFER_LENGTH_IN_BYTE_VAR, "20" );
     logger.exit();
   }
 
