@@ -3,7 +3,9 @@ package com.soundcloud.followermaze.server.dispatcher;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,7 +29,12 @@ class UserClientDispatcher extends BaseDispatcher {
   @Override
   public void run() {
 
-    final ExecutorService executorService = Executors.newFixedThreadPool( ConfigService.INSTANCE.getMaxThreadsUserClientDispatcher() );
+    final int corePoolSize = 50;
+    final int keepAliveTime = 5000;
+
+    // use ThreadPoolExecutor to enable loaddepending generation and starvation of threads
+    final ExecutorService executorService = new ThreadPoolExecutor( corePoolSize, ConfigService.INSTANCE.getMaxThreadsUserClientDispatcher(), keepAliveTime, TimeUnit.MILLISECONDS,
+        new LinkedBlockingQueue<Runnable>() );
 
     try {
       logger.info( "UserClientDispatcher is waiting for incoming connections..." );
