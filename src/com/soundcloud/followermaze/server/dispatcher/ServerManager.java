@@ -47,7 +47,6 @@ public class ServerManager {
     try {
       readySignalEventDispatcher.await();
       startedEventDispatcher = true;
-      logger.info( "Event Dispatcher is waiting for incoming connections..." );
     } catch ( InterruptedException e ) {
       logger.error( "Error wail starting up Event Dispatcher!", e );
     }
@@ -60,7 +59,6 @@ public class ServerManager {
 
       try {
         readySignalUserDispatcher.await();
-        logger.info( "User Client Dispatcher is waiting for incoming connections..." );
       } catch ( InterruptedException e ) {
         logger.error( "Error while starting up User Client Dispatcher!", e );
       }

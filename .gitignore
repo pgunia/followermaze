@@ -6,3 +6,4 @@ target/
 *.prefs
 /target/
 /bin/
+/doc/

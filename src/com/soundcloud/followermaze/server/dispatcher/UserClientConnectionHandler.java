@@ -21,6 +21,12 @@ public class UserClientConnectionHandler extends ConnectionHandler {
   /** Logger */
   private static final Logger logger = LogManager.getLogger( UserClientConnectionHandler.class );
 
+  /**
+   * Constructs a UserClientConnectionHandler
+   * 
+   * @param clientSocket
+   *          Socket channel over which a client is connected to the server
+   */
   public UserClientConnectionHandler( SocketChannel clientSocket ) {
     super( clientSocket );
   }

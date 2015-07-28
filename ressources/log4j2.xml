@@ -7,13 +7,13 @@
 			</PatternLayout>
 		</File>
 		<Console name="Console" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %M - %msg%xEx%n" />
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %msg%xEx%n" />
 		</Console>
 	</Appenders>
 	<Loggers>
 		<Root level="trace">
-			<!-- <AppenderRef ref="File" level="ERROR" />  -->
-		    <AppenderRef ref="Console" level="ERROR" />
+			<AppenderRef ref="File" level="INFO" />
+		    <AppenderRef ref="Console" level="INFO" />
 		</Root>
 	</Loggers>
 </Configuration>

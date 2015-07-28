@@ -33,6 +33,10 @@ public class EventWorker implements Runnable {
       nextEvent.processEvent();
       logger.debug( "Finished processing event: " + nextEvent );
 
+      if ( (currentNextSequenceNumber % 100000) == 0 ) {
+        logger.info( "Processed " + currentNextSequenceNumber + " events." );
+      }
+
       currentNextSequenceNumber++;
       nextEvent = EventHandlerService.INSTANCE.first();
     }
