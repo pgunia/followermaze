@@ -21,7 +21,7 @@
                   <archive>
                       <manifest>
                           <addClasspath>true</addClasspath>
-                          <mainClass>com.soundcloud.followermaze.server.main.DispatcherMain</mainClass>
+                          <mainClass>followermaze.server.main.DispatcherMain</mainClass>
                       </manifest>
                   </archive>
                   <descriptorRefs>
